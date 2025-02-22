@@ -6,10 +6,11 @@ import QuestionInput from "../Form Renderer/QuestionInput";
 interface QuestionItemProps {
   question: Question;
   onUpdate: (updatedQuestion: Partial<Question>) => void;
-  showInput: boolean;
+  isLoading?: boolean;
+  showInput?: boolean;
 }
 
-const QuestionItem = ({ question, onUpdate, showInput }: QuestionItemProps) => {
+const QuestionItem = ({ question, onUpdate }: QuestionItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (

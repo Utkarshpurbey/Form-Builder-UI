@@ -1,20 +1,22 @@
 import { useState } from "react";
-import { QuestionType } from "./types";
 import QuestionInput from "../Form Renderer/QuestionInput";
 import { toast } from "react-toastify";
+import { Question,QuestionType } from "../../utils/types";
 
 interface AddQuestionFormProps {
-  onAdd: (newQuestion: {
-    type: QuestionType;
-    label: string;
-    required: boolean;
-    options?: string[];
-  }) => void;
+  onAdd: (newQuestion: Omit<Question, 'id'>) => void;
+  // onAdd: (newQuestion: {
+  //   type: QuestionType;
+  //   label: string;
+  //   required: boolean;
+  //   options?: string[];
+  // }) => void;
 }
 
 const AddQuestionForm = ({ onAdd }: AddQuestionFormProps) => {
   const [newQuestion, setNewQuestion] = useState({
     type: "text" as QuestionType,
+    id:'',
     label: "",
     required: false,
     options: [] as string[],
@@ -30,7 +32,7 @@ const AddQuestionForm = ({ onAdd }: AddQuestionFormProps) => {
       return;
     }
     onAdd(newQuestion);
-    setNewQuestion({ type: "text", label: "", required: false, options: [] });
+    setNewQuestion({ id:crypto.randomUUID(),type: "text", label: "", required: false, options: [] });
   };
 
   return (

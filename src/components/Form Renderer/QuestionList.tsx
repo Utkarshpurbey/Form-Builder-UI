@@ -1,5 +1,6 @@
-import { Question } from "./types";
+
 import AnswerInput from "./AnswerInput";
+import { Question, QuestionType } from "../../utils/types";
 
 interface QuestionListProps {
   questions: Question[];

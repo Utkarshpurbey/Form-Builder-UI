@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Question, FormSchema, ValidationErrors } from "./types";
+import { Question, FormSchema, ValidationErrors, QuestionType } from "../../utils/types";
 import QuestionList from "./QuestionList";
 import SubmitButton from "./SubmitButton";
 import { toast } from "react-toastify";
@@ -26,14 +26,14 @@ const FormRenderer = ({ schema }: FormRendererProps) => {
 
   const handleInputChange = (id: string, value: string) => {
     setAnswers((prev) => ({ ...prev, [id]: value }));
-    setErrors((prev) => ({ ...prev, [id]: "" })); // Clear error on input change
+    setErrors((prev: ValidationErrors) => ({ ...prev, [id]: "" })); // Clear error on input change
   };
 
   const handleBlur = (id: string, type: QuestionType, value: string) => {
     if (type === "email" && !validateEmail(value)) {
-      setErrors((prev) => ({ ...prev, [id]: "Invalid email address" }));
+      setErrors((prev: ValidationErrors) => ({ ...prev, [id]: "Invalid email address" }));
     } else if (type === "phone" && !validatePhone(value)) {
-      setErrors((prev) => ({ ...prev, [id]: "Invalid phone number" }));
+      setErrors((prev: ValidationErrors) => ({ ...prev, [id]: "Invalid phone number" }));
     }
   };
 
@@ -41,7 +41,7 @@ const FormRenderer = ({ schema }: FormRendererProps) => {
     const newErrors: ValidationErrors = {};
   
     // Validate all required questions
-    schema.questions.forEach((q) => {
+    schema.questions.forEach((q:Question) => {
       if (q.required && !answers[q.id]?.trim()) {
         newErrors[q.id] = "This field is required";
       } else if (q.type === "email" && !validateEmail(answers[q.id] || "")) {
@@ -92,7 +92,7 @@ const FormRenderer = ({ schema }: FormRendererProps) => {
           <h2 className="text-xl font-bold text-gray-800 mb-4">Submitted Values</h2>
           {Object.entries(submittedValues).map(([id, value]) => (
             <div key={id} className="mb-2">
-              <strong>{schema.questions.find((q) => q.id === id)?.label}:</strong> {value}
+              <strong>{schema.questions.find((q:Question) => q.id === id)?.label}:</strong> {value}
             </div>
           ))}
         </div>

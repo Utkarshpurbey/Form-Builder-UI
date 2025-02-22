@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Question } from "../../utils/types";
+import { Question, QuestionType } from "../../utils/types";
 
 interface QuestionInputProps {
   question: Question;

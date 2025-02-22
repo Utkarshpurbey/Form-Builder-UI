@@ -12,7 +12,7 @@ const App = () => {
   const intialiseFormSchema = () => {
     const savedFormSchema = localStorage.getItem("formSchema");
 
-    const parsedSchema = JSON.parse(savedFormSchema);
+    const parsedSchema = savedFormSchema ? JSON.parse(savedFormSchema) : null;
     return (parsedSchema?.questions?.length || parsedSchema?.title)
       ? parsedSchema
       : {
@@ -22,7 +22,7 @@ const App = () => {
           questions: [],
         };
   };
-  const [formSchema, setFormSchema] = useState<FormSchema>(intialiseFormSchema);
+  const [formSchema, ] = useState<FormSchema>(intialiseFormSchema);
 
   // Load saved form schema from localStorage on initial render
   useEffect(() => {

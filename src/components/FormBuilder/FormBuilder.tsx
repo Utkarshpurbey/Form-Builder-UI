@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-import { Question, FormSchema } from "./utils/types";
+import { Question, FormSchema } from "../../utils/types";
 import QuestionItem from "./QuestionItem";
 import AddQuestionForm from "./AddQuestionForm";
 import SaveFormButton from "./SaveFormButton";
@@ -51,7 +51,7 @@ const FormBuilder = ({ onFormSave, initialFormSchema }: FormBuilderProps) => {
     autoSaveForm();
   }, [questions, formTitle, formDescription]);
 
-  const addQuestion = (newQuestion: Question) => {
+  const addQuestion = (newQuestion: Omit<Question, 'id'>) => {
     const questionToAdd: Question = {
       id: crypto.randomUUID(),
       type: newQuestion.type,
