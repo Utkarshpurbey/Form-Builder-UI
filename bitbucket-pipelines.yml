@@ -1,0 +1,28 @@
+# Bitbucket Pipelines: Vite (React) build
+# This project uses Vite, not Next.js — use "npm run build" (output: dist/)
+
+image: node:20
+
+pipelines:
+  default:
+    - step:
+        name: Build
+        caches:
+          - node
+        script:
+          - npm ci
+          - npm run build
+        artifacts:
+          - dist/**
+
+  branches:
+    main:
+      - step:
+          name: Build
+          caches:
+            - node
+          script:
+            - npm ci
+            - npm run build
+          artifacts:
+            - dist/**
