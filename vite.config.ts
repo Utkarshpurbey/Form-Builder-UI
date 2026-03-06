@@ -4,5 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(),],
+  plugins: [react(), tailwindcss()],
+  // GitHub Pages serves at https://<user>.github.io/<repo-name>/ — set BASE_PATH in CI
+  base: process.env.BASE_PATH ?? '/',
 })
