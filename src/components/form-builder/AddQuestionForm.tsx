@@ -1,5 +1,5 @@
 import { useState } from "react";
-import QuestionInput from "../Form Renderer/QuestionInput";
+import QuestionInput from "../form-renderer/QuestionInput";
 import { toast } from "react-toastify";
 import { Question,QuestionType } from "../../utils/types";
 
@@ -27,8 +27,8 @@ const AddQuestionForm = ({ onAdd }: AddQuestionFormProps) => {
       toast.error("Please fill in all required fields.");
       return;
     }
-    if (newQuestion.type === "select" && newQuestion.options.length === 0) {
-      toast.error("Please fill in all required fields.");
+    if (["select", "radio", "multiselect"].includes(newQuestion.type) && (!newQuestion.options?.length)) {
+      toast.error("Add at least one option for this question type.");
       return;
     }
     onAdd(newQuestion);
@@ -36,17 +36,18 @@ const AddQuestionForm = ({ onAdd }: AddQuestionFormProps) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md mb-6">
-      <h2 className="text-xl font-semibold mb-4">Add New Question</h2>
+    <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
+      <h2 className="text-lg font-semibold text-slate-800 mb-6">Add new question</h2>
       <QuestionInput
         question={newQuestion}
         onUpdate={(updated) => setNewQuestion({ ...newQuestion, ...updated })}
       />
       <button
+        type="button"
         onClick={handleAdd}
-        className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        className="mt-6 px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all"
       >
-        Add
+        Add question
       </button>
     </div>
   );

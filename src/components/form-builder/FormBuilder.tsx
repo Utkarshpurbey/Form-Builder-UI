@@ -22,8 +22,8 @@ const FormBuilder = ({ onFormSave, initialFormSchema }: FormBuilderProps) => {
   useEffect(() => {
     const autoSaveForm = async () => {
       const validQuestions = questions.filter((q) => {
-        if (q.required && !q.label.trim()) return false; // Invalid if required and empty
-        if (q.type === "select" && (!q.options || q.options.length === 0)) return false; // Invalid if no options
+        if (q.required && !q.label.trim()) return false;
+        if (["select", "radio", "multiselect"].includes(q.type) && (!q.options || q.options.length === 0)) return false;
         return true;
       });
 
@@ -84,55 +84,58 @@ const FormBuilder = ({ onFormSave, initialFormSchema }: FormBuilderProps) => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-white p-6 rounded-lg shadow-sm mb-6">
-        <input
-          type="text"
-          value={formTitle}
-          onChange={(e) => setFormTitle(e.target.value)}
-          placeholder="Form Title"
-          className="text-3xl font-bold text-gray-800 w-full focus:outline-none"
-        />
-        <input
-          type="text"
-          value={formDescription}
-          onChange={(e) => setFormDescription(e.target.value)}
-          placeholder="Form Description"
-          className="text-sm text-gray-500 w-full mt-2 focus:outline-none"
-        />
-      </div>
-
-      {/* List of Questions */}
-      <div className="space-y-4">
-        {questions?.map((q) => (
-          <QuestionItem
-            key={q.id}
-            question={q}
-            onUpdate={(updated) => updateQuestion(q.id, updated)}
-            showInput={false}
-            isLoading={loadingQuestions[q.id] || false}
+    <div className="p-6 min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/80">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <header className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
+          <input
+            type="text"
+            value={formTitle}
+            onChange={(e) => setFormTitle(e.target.value)}
+            placeholder="Form title"
+            className="w-full text-2xl font-bold text-slate-800 placeholder:text-slate-400 focus:outline-none bg-transparent"
           />
-        ))}
+          <input
+            type="text"
+            value={formDescription}
+            onChange={(e) => setFormDescription(e.target.value)}
+            placeholder="Form description (optional)"
+            className="w-full mt-2 text-slate-500 placeholder:text-slate-400 focus:outline-none bg-transparent"
+          />
+        </header>
+
+        <div className="space-y-5">
+          {questions?.map((q) => (
+            <QuestionItem
+              key={q.id}
+              question={q}
+              onUpdate={(updated) => updateQuestion(q.id, updated)}
+              showInput={false}
+              isLoading={loadingQuestions[q.id] || false}
+            />
+          ))}
+        </div>
+
+        {!isAddingQuestion && (
+          <button
+            type="button"
+            onClick={() => setIsAddingQuestion(true)}
+            className="w-full sm:w-auto mt-2 px-6 py-3 rounded-xl border-2 border-dashed border-slate-200 text-slate-600 font-medium hover:border-indigo-300 hover:bg-indigo-50/50 hover:text-indigo-700 transition-all flex items-center justify-center gap-2"
+          >
+            <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add question
+          </button>
+        )}
+
+        {isAddingQuestion && (
+          <div className="pt-2">
+            <AddQuestionForm onAdd={addQuestion} />
+          </div>
+        )}
+
+        <SaveFormButton onClick={saveForm} />
       </div>
-
-      {/* Add Question Button */}
-      {!isAddingQuestion && (
-        <button
-          onClick={() => setIsAddingQuestion(true)}
-          className="mt-6 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-all duration-200 flex items-center gap-2"
-        >
-          <i className="fas fa-plus"></i>
-          <span>Add Question</span>
-        </button>
-      )}
-
-      {/* Add Question Form */}
-      {isAddingQuestion && <div className="py-3">
-        <AddQuestionForm onAdd={addQuestion} /></div>}
-
-      {/* Save Form Button */}
-      <SaveFormButton onClick={saveForm} />
     </div>
   );
 };

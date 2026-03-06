@@ -4,7 +4,13 @@ export type QuestionType =
   | "number"
   | "email"
   | "phone"
-  | "description";
+  | "description"
+  | "checkbox"
+  | "radio"
+  | "date"
+  | "time"
+  | "multiselect"
+  | "url";
 
 export interface Question {
   id: string;
