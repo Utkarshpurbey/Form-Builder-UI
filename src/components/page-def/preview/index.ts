@@ -1,5 +1,5 @@
 export { default as AnswerInput } from "./AnswerInput";
-export type { BaseAnswerInputProps } from "./types";
+export type { BaseAnswerInputProps, QuestionType } from "./types";
 export { TextAnswerInput } from "./TextAnswerInput";
 export type { TextAnswerInputProps } from "./TextAnswerInput";
 export { NumberAnswerInput } from "./NumberAnswerInput";

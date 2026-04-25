@@ -1,5 +1,5 @@
-import type { PageDef, PageComponentDef } from "../../utils/pageDef";
-import { COMPONENT_SPECS, getTypeGroup } from "../../reference/component-reference-data";
+import type { PageDef, PageComponentDef } from "./pageDef";
+import { COMPONENT_SPECS, getTypeGroup } from "../../../reference/component-reference-data";
 
 const inputClass =
   "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400";

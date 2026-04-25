@@ -1,4 +1,4 @@
-import type { QuestionType } from "../../lib/form-schema";
+import type { QuestionType } from "./types";
 import { TextAnswerInput } from "./TextAnswerInput";
 import { NumberAnswerInput } from "./NumberAnswerInput";
 import { EmailAnswerInput } from "./EmailAnswerInput";
@@ -6,7 +6,7 @@ import { PhoneAnswerInput } from "./PhoneAnswerInput";
 import { DescriptionAnswerInput } from "./DescriptionAnswerInput";
 import { SelectAnswerInput } from "./SelectAnswerInput";
 
-export type { BaseAnswerInputProps } from "./types";
+export type { BaseAnswerInputProps, QuestionType } from "./types";
 export { TextAnswerInput } from "./TextAnswerInput";
 export type { TextAnswerInputProps } from "./TextAnswerInput";
 export { NumberAnswerInput } from "./NumberAnswerInput";

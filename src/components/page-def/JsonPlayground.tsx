@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
-import type { PageDef, PageComponentDef } from "../../utils/pageDef";
-import { REGISTRY, getVariantProps } from "../page-def-builder/registry";
-import { SAVED_PAGE_DEF_KEY } from "../page-def-builder/PageDefBuilder";
-import type { PageComponentType } from "../../utils/pageDef";
+import type { PageDef, PageComponentDef, PageComponentType } from "./builder/pageDef";
+import { REGISTRY, getVariantProps } from "./builder/registry";
+import { SAVED_PAGE_DEF_KEY } from "./builder/PageDefBuilder";
 
 const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const validatePhone = (phone: string) => /^\d{10}$/.test(phone);
@@ -57,7 +56,7 @@ function loadSavedPageDef(): PageDef | null {
   }
 }
 
-export default function PageDefPlayground() {
+export default function JsonPlayground() {
   const initialDef = loadSavedPageDef() ?? EXAMPLE_PAGE_DEF;
   const [jsonInput, setJsonInput] = useState(JSON.stringify(initialDef, null, 2));
   const [pageDef, setPageDef] = useState<PageDef>(initialDef);
@@ -65,7 +64,7 @@ export default function PageDefPlayground() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submittedValues, setSubmittedValues] = useState<Record<string, string> | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isFromSaved] = useState(() => loadSavedPageDef() !== null);
+  const [showSavedBanner, setShowSavedBanner] = useState(() => loadSavedPageDef() !== null);
 
   const runActions = (actionIds: string[], value: string, comp: PageComponentDef) => {
     if (!pageDef.actions || actionIds.length === 0) return;
@@ -89,6 +88,16 @@ export default function PageDefPlayground() {
         console.error("Action error", id, e);
       }
     });
+  };
+
+  const resetExample = () => {
+    setJsonInput(JSON.stringify(EXAMPLE_PAGE_DEF, null, 2));
+    setPageDef(EXAMPLE_PAGE_DEF);
+    setValues({});
+    setFieldErrors({});
+    setSubmittedValues(null);
+    setError(null);
+    setShowSavedBanner(false);
   };
 
   const handleApply = () => {
@@ -181,17 +190,33 @@ export default function PageDefPlayground() {
     "w-full h-[400px] px-4 py-3 rounded-xl border-2 border-slate-200 bg-white font-mono text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10";
 
   return (
-    <div className="flex flex-col md:flex-row gap-6 p-6 min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/80">
-      <div className="md:w-1/2 space-y-4">
-        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-800">PageDef JSON</h2>
-          {isFromSaved && (
-            <p className="text-sm text-emerald-600 mt-1 font-medium">
-              Loaded from PageDef Builder. Edit JSON and click Apply to re-render.
+    <div className="flex flex-col md:flex-row gap-6 p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto bg-gradient-to-b from-slate-50 to-slate-100/80">
+      <div className="md:w-1/2 space-y-4 min-h-0 flex flex-col">
+        <aside
+          className="rounded-xl border border-teal-100 bg-teal-50/80 px-4 py-3 text-sm text-teal-950"
+          aria-label="How to use this screen"
+        >
+          <p className="font-medium text-teal-900">Quick steps</p>
+          <ol className="mt-2 list-decimal list-inside space-y-1 text-teal-900/90">
+            <li>This is the full <strong>PageDef</strong> format (same as the visual builder).</li>
+            <li>After <strong>Save</strong> in the builder, open this tab again — it loads your saved page.</li>
+            <li>Click <strong>Apply &amp; render page</strong> after JSON edits.</li>
+          </ol>
+        </aside>
+        <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex-1 min-h-0 flex flex-col">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-lg font-semibold text-slate-800">Editor — PageDef (JSON)</h2>
+            <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Step 1</span>
+          </div>
+          {showSavedBanner && (
+            <p className="text-sm text-emerald-700 mt-2 rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-2">
+              Loaded from <strong>Visual builder</strong> (local save). Edit JSON and click Apply to re-render, or use{" "}
+              <strong>Reset example</strong> for the demo page.
             </p>
           )}
-          <p className="text-sm text-slate-500 mt-1">
-            Use <code className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">&quot;onChange&quot;: &quot;@actionDef.logName&quot;</code> to run actions.
+          <p className="text-sm text-slate-500 mt-2">
+            Use <code className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">&quot;onChange&quot;: &quot;@actionDef.logName&quot;</code> to run actions from the{" "}
+            <code className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700">actions</code> map.
           </p>
           <textarea
             value={jsonInput}
@@ -205,16 +230,27 @@ export default function PageDefPlayground() {
               {error}
             </p>
           )}
-          <button
-            type="button"
-            onClick={handleApply}
-            className="mt-4 px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all"
-          >
-            Apply &amp; render page
-          </button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={handleApply}
+              className="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 transition-all"
+            >
+              Apply &amp; render page
+            </button>
+            <button
+              type="button"
+              onClick={resetExample}
+              className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 text-sm font-medium hover:bg-slate-50"
+            >
+              Reset example
+            </button>
+          </div>
         </div>
       </div>
-      <div className="md:w-1/2 space-y-6 overflow-auto">
+      <div className="md:w-1/2 space-y-4 min-h-0 flex flex-col overflow-hidden">
+        <p className="text-xs font-medium uppercase tracking-wide text-slate-500 shrink-0">Live page</p>
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-6">
         <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{pageDef.title}</h1>
           {pageDef.description && (
@@ -259,6 +295,7 @@ export default function PageDefPlayground() {
             </pre>
           </div>
         )}
+        </div>
       </div>
     </div>
   );

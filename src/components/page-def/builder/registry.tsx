@@ -1,12 +1,12 @@
 import type React from "react";
-import type { PageComponentType } from "../../utils/pageDef";
-import { TextField } from "../form-renderer/answer-inputs/TextField";
-import { Number as NumberInput } from "../form-renderer/answer-inputs/Number";
-import { TextArea } from "../form-renderer/answer-inputs/TextArea";
-import { Select } from "../form-renderer/answer-inputs/Select";
-import { Choice } from "../form-renderer/answer-inputs/Choice";
-import { Checkbox } from "../form-renderer/answer-inputs/Checkbox";
-import { DateTime } from "../form-renderer/answer-inputs/DateTime";
+import type { PageComponentType } from "./pageDef";
+import { TextField } from "../widgets/TextField";
+import { Number as NumberInput } from "../widgets/Number";
+import { TextArea } from "../widgets/TextArea";
+import { Select } from "../widgets/Select";
+import { Choice } from "../widgets/Choice";
+import { Checkbox } from "../widgets/Checkbox";
+import { DateTime } from "../widgets/DateTime";
 
 /** Maps each PageDef type to a core component. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,6 +1,6 @@
 /**
  * Reference data for PageDef components.
- * Used by ComponentReference.tsx. This folder can be removed when no longer needed.
+ * Used by `page-def/builder` (palette, defaults, config panel).
  */
 
 export const BASE_PROPS_DOC = {

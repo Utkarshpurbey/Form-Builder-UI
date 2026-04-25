@@ -1,4 +1,4 @@
-import { PALETTE_SPECS } from "../../reference/component-reference-data";
+import { PALETTE_SPECS } from "../../../reference/component-reference-data";
 
 const DRAG_TYPE = "application/x-pagedef-component-type";
 

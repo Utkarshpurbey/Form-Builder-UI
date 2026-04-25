@@ -1,6 +1,5 @@
 /**
- * Component reference UI: docs + live demos for all PageDef components.
- * Lives in src/reference/ — can be removed when no longer needed.
+ * Component reference: docs + live demos for PageDef builder component types.
  */
 import { useState, useEffect } from "react";
 import {
@@ -9,8 +8,8 @@ import {
   PAGEDEF_STRUCTURE,
 } from "./component-reference-data";
 import type { ComponentSpec } from "./component-reference-data";
-import { REGISTRY, getVariantProps } from "../components/page-def-builder/registry";
-import type { PageComponentType } from "../utils/pageDef";
+import { REGISTRY, getVariantProps } from "../components/page-def/builder/registry";
+import type { PageComponentType } from "../components/page-def/builder/pageDef";
 
 const DEFAULT_VALUES: Record<string, string> = {
   text: "",
@@ -27,7 +26,7 @@ const DEFAULT_VALUES: Record<string, string> = {
   time: "",
 };
 
-/** Build the JSON-serializable props object (what is passed to the component). Updates with current value. */
+/** Build JSON-serializable props passed to the live demo. */
 function getLivePropsJson(spec: ComponentSpec, currentValue: string): Record<string, unknown> {
   const example = spec.exampleJson as Record<string, unknown>;
   const live: Record<string, unknown> = {
@@ -52,7 +51,6 @@ interface ComponentDemoProps {
   spec: ComponentSpec;
   value: string;
   onChange: (v: string) => void;
-  /** When set, component is driven by this (e.g. from editable JSON). Otherwise uses spec.exampleJson. */
   parsedProps: Record<string, unknown> | null;
 }
 
@@ -100,7 +98,6 @@ export default function ComponentReference() {
   const [values, setValues] = useState<Record<string, string>>(DEFAULT_VALUES);
   const [propsJson, setPropsJson] = useState<Record<string, string>>(initialPropsJson);
 
-  // When JSON is edited and has a valid "value", sync it to our values so the component reflects it
   useEffect(() => {
     let updates: Record<string, string> | null = null;
     COMPONENT_SPECS.forEach((spec) => {
@@ -134,7 +131,7 @@ export default function ComponentReference() {
   };
 
   return (
-    <div className="p-6 min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/80">
+    <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto bg-gradient-to-b from-slate-50 to-slate-100/80">
       <div className="max-w-4xl mx-auto space-y-10">
         <header className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
           <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
@@ -287,11 +284,6 @@ export default function ComponentReference() {
             </div>
           ))}
         </section>
-
-        <footer className="text-center text-sm text-slate-500 py-6">
-          This reference is in <code className="px-1 rounded bg-slate-100">src/reference/</code>.
-          Remove the folder when no longer needed.
-        </footer>
       </div>
     </div>
   );

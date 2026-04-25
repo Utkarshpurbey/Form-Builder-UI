@@ -1,3 +1,7 @@
+/**
+ * JSON shape for the visual builder and JSON playground (`JsonPlayground`).
+ * Distinct from `lib/page-def`, which is the template / marketing schema.
+ */
 export type PageComponentType =
   | "text"
   | "number"
