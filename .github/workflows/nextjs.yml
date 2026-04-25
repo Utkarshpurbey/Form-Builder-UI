@@ -1,10 +1,19 @@
 # Build and deploy Vite (React) site to GitHub Pages
+#
+# Branch "X" not allowed to deploy to github-pages?
+#   Repo → Settings → Environments → github-pages → "Deployment branches and tags"
+#   → choose "All branches", or "Selected branches" and add patterns (e.g. main, dev).
+#
 name: Deploy Vite site to Pages
 
 on:
   push:
     branches: ["main"]
   workflow_dispatch:
+
+# Opt Actions (checkout, setup-node, etc.) into Node 24 runtime; see GitHub changelog 2025-09-19.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
@@ -25,7 +34,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
       - name: Install dependencies
