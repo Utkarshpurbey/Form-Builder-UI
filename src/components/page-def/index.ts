@@ -1,3 +1,2 @@
-export { PageDefEditor } from "./PageDefEditor";
-export { JsonFormEditor } from "./JsonFormEditor";
-export { PageDefTemplatesPage } from "./PageDefTemplatesPage";
+export { TemplatesPage } from "./TemplatesPage";
+export { LivePreview } from "./preview/LivePreview";

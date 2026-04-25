@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { toast } from "react-toastify";
-import type { PageDef } from "../../utils/pageDef";
+import type { PageDef } from "./pageDef";
 import ComponentPalette from "./ComponentPalette";
 import PageCanvas from "./PageCanvas";
 import ComponentConfigPanel from "./ComponentConfigPanel";
@@ -84,18 +84,29 @@ export default function PageDefBuilder() {
   const handleSave = () => {
     try {
       localStorage.setItem(SAVED_PAGE_DEF_KEY, JSON.stringify(pageDef, null, 2));
-      toast.success("PageDef saved. Open \"JSON PageDef\" in the nav to test the form.");
+      toast.success(
+        'PageDef saved. Open "Page preview" in the top bar to try the full form — it loads this save automatically.',
+      );
     } catch {
       toast.error("Failed to save PageDef.");
     }
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] bg-slate-100">
+    <div className="flex flex-1 min-h-0 bg-slate-100">
       <aside className="w-64 shrink-0 bg-white border-r border-slate-200 shadow-sm overflow-hidden flex flex-col">
         <ComponentPalette />
       </aside>
       <main className="flex-1 min-w-0 p-4 overflow-hidden flex flex-col">
+        <div
+          className="mb-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-xs text-slate-600 shadow-sm"
+          role="region"
+          aria-label="Builder tips"
+        >
+          <span className="font-semibold text-slate-800">Tips: </span>
+          Drag a field from the left onto the page. Click a field to edit it in the right panel. Use{" "}
+          <strong className="text-slate-800">Save</strong> then open <strong className="text-slate-800">Page preview</strong> to test submit and validation.
+        </div>
         <div className="flex gap-1 mb-3 items-center justify-between">
           <div className="flex gap-1">
           <button

@@ -1,3 +1,12 @@
+/** Question kinds supported by `preview/AnswerInput` (lib PageDef template previews). */
+export type QuestionType =
+  | "text"
+  | "select"
+  | "number"
+  | "email"
+  | "phone"
+  | "description";
+
 export interface BaseAnswerInputProps {
   value: string;
   error?: string;

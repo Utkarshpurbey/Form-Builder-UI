@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PageDef } from "../../utils/pageDef";
+import type { PageDef } from "./pageDef";
 import { REGISTRY, getVariantProps } from "./registry";
 import type { RegistryKey } from "./registry";
 import { DRAG_TYPE } from "./ComponentPalette";
@@ -150,7 +150,9 @@ export default function PageCanvas({
         )}
         <div className="space-y-0">
           {pageDef.components.map((comp) => {
-            const { id, type, onChange: _onChange, ...rawProps } = comp;
+            // Strip `onChange` (e.g. @actionDef refs) — canvas uses its own change handler
+            const { id, type, onChange: _ignoredOnChange, ...rawProps } = comp;
+            void _ignoredOnChange;
             const Component = REGISTRY[type as RegistryKey];
             const isSelected = selectedId === id;
             if (!Component)

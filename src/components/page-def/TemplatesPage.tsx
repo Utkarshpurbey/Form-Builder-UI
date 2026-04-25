@@ -1,14 +1,15 @@
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   PAGE_DEF_TEMPLATES,
 } from "../../lib/page-def-templates";
-import { INJECTED_PAGE_DEF_TEMPLATE_KEY } from "../page-def-builder/PageDefBuilder";
-import type { PageDef as BuilderPageDef, PageComponentType } from "../../utils/pageDef";
+import { LivePreview } from "./preview/LivePreview";
+import { INJECTED_PAGE_DEF_TEMPLATE_KEY } from "./builder/PageDefBuilder";
+import type { PageDef as BuilderPageDef, PageComponentType } from "./builder/pageDef";
 import type { PageDef as TemplatePageDef } from "../../lib/page-def";
 
 type TemplateEntry = [string, (typeof PAGE_DEF_TEMPLATES)[string]];
 
-interface PageDefTemplatesPageProps {
+interface TemplatesPageProps {
   onOpenBuilder: () => void;
 }
 
@@ -23,6 +24,9 @@ const COMPONENT_TYPE_MAP: Record<
   DescriptionAnswerInput: "textarea",
   SelectAnswerInput: "select",
 };
+
+const cloneTemplatePageDef = (template: TemplatePageDef): TemplatePageDef =>
+  JSON.parse(JSON.stringify(template)) as TemplatePageDef;
 
 const toBuilderPageDef = (template: TemplatePageDef): BuilderPageDef => {
   const components = template.components.map((component) => {
@@ -152,11 +156,27 @@ const getTemplatePreviewImage = (templateKey: string, title: string) => {
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 };
 
-export const PageDefTemplatesPage = ({ onOpenBuilder }: PageDefTemplatesPageProps) => {
+export const TemplatesPage = ({ onOpenBuilder }: TemplatesPageProps) => {
   const templateEntries = useMemo(
     () => Object.entries(PAGE_DEF_TEMPLATES) as TemplateEntry[],
     []
   );
+
+  const [previewKey, setPreviewKey] = useState<string | null>(null);
+
+  const previewTemplate = useMemo(() => {
+    if (!previewKey) return null;
+    return PAGE_DEF_TEMPLATES[previewKey] ?? null;
+  }, [previewKey]);
+
+  /** Fresh clone whenever modal opens (`previewKey` set) so live preview state resets */
+  const previewPageDef = useMemo(
+    () =>
+      previewKey ? cloneTemplatePageDef(PAGE_DEF_TEMPLATES[previewKey]) : null,
+    [previewKey]
+  );
+
+  const closePreview = useCallback(() => setPreviewKey(null), []);
 
   const handleEditInBuilder = (template: TemplatePageDef) => {
     const builderTemplate = toBuilderPageDef(template);
@@ -164,16 +184,31 @@ export const PageDefTemplatesPage = ({ onOpenBuilder }: PageDefTemplatesPageProp
       INJECTED_PAGE_DEF_TEMPLATE_KEY,
       JSON.stringify(builderTemplate)
     );
+    setPreviewKey(null);
     onOpenBuilder();
   };
 
+  useEffect(() => {
+    if (!previewKey) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closePreview();
+    };
+    document.addEventListener("keydown", onKeyDown);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [previewKey, closePreview]);
+
   return (
-    <div className="bg-slate-50 min-h-screen p-6 space-y-6">
+    <div className="bg-slate-50 flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-900">PageDef Templates</h1>
-        <p className="text-sm text-slate-600 mt-1">
-          Pick any pre-made template and move to the PageDef Builder only when
-          you want to customize it.
+        <h1 className="text-2xl font-bold text-slate-900">Templates</h1>
+        <p className="text-sm text-slate-600 mt-1 max-w-2xl">
+          Preview shows the real form UI. Use <strong className="text-slate-800">Edit in visual builder</strong> only when you want
+          to edit the template.
         </p>
       </div>
 
@@ -185,16 +220,20 @@ export const PageDefTemplatesPage = ({ onOpenBuilder }: PageDefTemplatesPageProp
               key={key}
               className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:shadow-md"
             >
-              <div className="rounded-lg border border-slate-100 bg-slate-50 overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setPreviewKey(key)}
+                className="w-full text-left rounded-lg border border-slate-100 bg-slate-50 overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+              >
                 <img
                   src={previewImage}
                   alt={`${template.title} preview`}
                   width={PREVIEW_SVG_W}
                   height={PREVIEW_SVG_H}
-                  className="w-full h-auto block max-w-full"
+                  className="w-full h-auto block max-w-full pointer-events-none"
                   decoding="async"
                 />
-              </div>
+              </button>
               <div className="flex items-start justify-between gap-2">
                 <h2 className="mt-3 text-base font-semibold text-slate-800">
                   {template.title}
@@ -204,22 +243,85 @@ export const PageDefTemplatesPage = ({ onOpenBuilder }: PageDefTemplatesPageProp
                 </span>
               </div>
               {template.description && (
-                <p className="text-sm text-slate-600 mt-2">{template.description}</p>
+                <p className="text-sm text-slate-600 mt-2 line-clamp-2">{template.description}</p>
               )}
               <p className="text-xs text-slate-500 mt-3">
                 Components: {template.components.length}
               </p>
               <button
                 type="button"
-                onClick={() => handleEditInBuilder(template)}
-                className="mt-4 px-3 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+                onClick={() => setPreviewKey(key)}
+                className="mt-4 w-full px-3 py-2 rounded-lg text-sm font-medium bg-white text-indigo-700 border border-indigo-200 hover:bg-indigo-50 transition-colors"
               >
-                Edit in PageDef Builder
+                Preview template
               </button>
             </div>
           );
         })}
       </div>
+
+      {previewKey && previewTemplate && previewPageDef && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+          role="presentation"
+          onClick={closePreview}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="template-preview-title"
+            className="relative flex w-full max-w-3xl max-h-[90vh] flex-col rounded-2xl border border-slate-200 bg-slate-100 shadow-xl shadow-slate-900/20 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="shrink-0 z-10 flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-5 py-4">
+              <div className="min-w-0 pr-4">
+                <h2
+                  id="template-preview-title"
+                  className="text-lg font-semibold text-slate-900"
+                >
+                  Template preview
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">
+                  <span className="font-mono">{previewKey}</span>
+                  <span className="mx-1.5">·</span>
+                  {previewTemplate.components.length} fields
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closePreview}
+                className="shrink-0 rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                aria-label="Close preview"
+              >
+                <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
+              <LivePreview pageDef={previewPageDef} />
+            </div>
+
+            <div className="shrink-0 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-slate-200 bg-white px-5 py-4">
+              <button
+                type="button"
+                onClick={closePreview}
+                className="px-4 py-2.5 rounded-xl text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => handleEditInBuilder(previewTemplate)}
+                className="px-4 py-2.5 rounded-xl text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm"
+              >
+                Edit in PageDef Builder
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
