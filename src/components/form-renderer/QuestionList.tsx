@@ -1,12 +1,13 @@
 import AnswerInput from "./AnswerInput";
-import { Question, QuestionType } from "../../utils/types";
+import type { Question } from "../../utils/types";
 
 interface QuestionListProps {
   questions: Question[];
   answers: { [key: string]: string };
   errors: { [key: string]: string };
   onInputChange: (id: string, value: string) => void;
-  onBlur: (id: string, type: QuestionType, value: string) => void;
+  /** `string` so both utils and lib schema renderers can pass the same handler */
+  onBlur: (id: string, type: string, value: string) => void;
 }
 
 const QuestionList = ({
@@ -36,7 +37,11 @@ const QuestionList = ({
               type={q.type}
               value={answers[q.id] || ""}
               error={errors[q.id]}
-              options={q.type === "select" || q.type === "radio" || q.type === "multiselect" ? q.options : undefined}
+              options={
+                q.type === "select" || q.type === "radio" || q.type === "multiselect"
+                  ? q.options
+                  : undefined
+              }
               onChange={(value) => onInputChange(q.id, value)}
               onBlur={(value) => onBlur(q.id, q.type, value)}
             />

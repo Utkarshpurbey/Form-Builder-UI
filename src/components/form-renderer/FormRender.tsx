@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Question, FormSchema, ValidationErrors, QuestionType } from "../../utils/types";
+import { Question, FormSchema, ValidationErrors } from "../../utils/types";
 import QuestionList from "./QuestionList";
 import SubmitButton from "./SubmitButton";
 import { toast } from "react-toastify";
@@ -30,7 +30,7 @@ const FormRenderer = ({ schema }: FormRendererProps) => {
     setErrors((prev) => ({ ...prev, [id]: "" }));
   };
 
-  const handleBlur = (id: string, type: QuestionType, value: string) => {
+  const handleBlur = (id: string, type: string, value: string) => {
     if (type === "email" && value && !validateEmail(value)) {
       setErrors((prev) => ({ ...prev, [id]: "Invalid email address" }));
     } else if (type === "phone" && value && !validatePhone(value)) {

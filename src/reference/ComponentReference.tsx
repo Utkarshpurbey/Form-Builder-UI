@@ -2,55 +2,29 @@
  * Component reference UI: docs + live demos for all PageDef components.
  * Lives in src/reference/ — can be removed when no longer needed.
  */
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BASE_PROPS_DOC,
   COMPONENT_SPECS,
   PAGEDEF_STRUCTURE,
 } from "./component-reference-data";
-import { Text } from "../components/form-renderer/answer-inputs/Text";
-import { Number as NumberInput } from "../components/form-renderer/answer-inputs/Number";
-import { Email } from "../components/form-renderer/answer-inputs/Email";
-import { Phone } from "../components/form-renderer/answer-inputs/Phone";
-import { Url } from "../components/form-renderer/answer-inputs/Url";
-import { TextArea } from "../components/form-renderer/answer-inputs/TextArea";
-import { Select } from "../components/form-renderer/answer-inputs/Select";
-import { Radio } from "../components/form-renderer/answer-inputs/Radio";
-import { MultiSelect } from "../components/form-renderer/answer-inputs/MultiSelect";
-import { Checkbox } from "../components/form-renderer/answer-inputs/Checkbox";
-import { Date as DateInput } from "../components/form-renderer/answer-inputs/Date";
-import { Time } from "../components/form-renderer/answer-inputs/Time";
 import type { ComponentSpec } from "./component-reference-data";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const REGISTRY: Record<string, React.ComponentType<any>> = {
-  Text,
-  Number: NumberInput,
-  Email,
-  Phone,
-  Url,
-  TextArea,
-  Select,
-  Radio,
-  MultiSelect,
-  Checkbox,
-  Date: DateInput,
-  Time,
-};
+import { REGISTRY, getVariantProps } from "../components/page-def-builder/registry";
+import type { PageComponentType } from "../utils/pageDef";
 
 const DEFAULT_VALUES: Record<string, string> = {
-  Text: "",
-  Number: "",
-  Email: "",
-  Phone: "",
-  Url: "",
-  TextArea: "",
-  Select: "",
-  Radio: "",
-  MultiSelect: "",
-  Checkbox: "false",
-  Date: "",
-  Time: "",
+  text: "",
+  number: "",
+  email: "",
+  phone: "",
+  url: "",
+  textarea: "",
+  select: "",
+  radio: "",
+  multiselect: "",
+  checkbox: "false",
+  date: "",
+  time: "",
 };
 
 /** Build the JSON-serializable props object (what is passed to the component). Updates with current value. */
@@ -83,7 +57,7 @@ interface ComponentDemoProps {
 }
 
 function ComponentDemo({ spec, value, onChange, parsedProps }: ComponentDemoProps) {
-  const Component = REGISTRY[spec.type];
+  const Component = REGISTRY[spec.type as PageComponentType];
   if (!Component) return null;
 
   const base = parsedProps ?? (spec.exampleJson as Record<string, unknown>);
@@ -93,6 +67,7 @@ function ComponentDemo({ spec, value, onChange, parsedProps }: ComponentDemoProp
     label: base.label ?? spec.type,
     helperText: base.helperText,
     required: base.required ?? false,
+    ...getVariantProps(spec.type as PageComponentType),
   };
   if (base.placeholder != null) props.placeholder = String(base.placeholder);
   if (base.options != null) props.options = Array.isArray(base.options) ? base.options : [];
@@ -100,10 +75,11 @@ function ComponentDemo({ spec, value, onChange, parsedProps }: ComponentDemoProp
   if (base.checkboxLabel != null) props.checkboxLabel = String(base.checkboxLabel);
   if (base.min != null) props.min = String(base.min);
   if (base.max != null) props.max = String(base.max);
+  if (base.id != null) props.id = String(base.id);
 
   return (
     <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-6">
-      <Component {...props} />
+      <Component {...(props as Record<string, unknown>)} />
     </div>
   );
 }

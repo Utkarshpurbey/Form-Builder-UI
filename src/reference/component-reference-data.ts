@@ -5,7 +5,7 @@
 
 export const BASE_PROPS_DOC = {
   id: { type: "string", required: true, description: "Unique component id (used as key in values)." },
-  type: { type: "PageComponentType", required: true, description: "Component type (e.g. \"Text\", \"Select\")." },
+  type: { type: "PageComponentType", required: true, description: "Component type (e.g. \"text\", \"select\")." },
   label: { type: "string", required: false, description: "Label shown above the control." },
   helperText: { type: "string", required: false, description: "Helper or hint text below the label." },
   required: { type: "boolean", required: false, description: "If true, form validation requires a value." },
@@ -21,125 +21,139 @@ export interface ComponentSpec {
   type: string;
   description: string;
   valueFormat: string;
+  /** Default label shown in PageDef Builder when this component is added. */
+  defaultLabel: string;
   specificProps: { name: string; type: string; required: boolean; description: string }[];
   exampleJson: object;
 }
 
 export const COMPONENT_SPECS: ComponentSpec[] = [
   {
-    type: "Text",
+    type: "text",
     description: "Single-line text input.",
     valueFormat: "string",
+    defaultLabel: "Short text",
     specificProps: [
       { name: "placeholder", type: "string", required: false, description: "Placeholder text when empty." },
     ],
-    exampleJson: { id: "name", type: "Text", label: "Full Name", required: true, placeholder: "Enter your name" },
+    exampleJson: { id: "name", type: "text", label: "Full Name", required: true, placeholder: "Enter your name" },
   },
   {
-    type: "Number",
+    type: "number",
     description: "Numeric input with optional min/max/step.",
     valueFormat: "string (numeric)",
+    defaultLabel: "Number",
     specificProps: [
       { name: "placeholder", type: "string", required: false, description: "Placeholder when empty." },
       { name: "min", type: "number", required: false, description: "Minimum value." },
       { name: "max", type: "number", required: false, description: "Maximum value." },
       { name: "step", type: "number", required: false, description: "Step increment." },
     ],
-    exampleJson: { id: "age", type: "Number", label: "Age", min: 0, max: 120 },
+    exampleJson: { id: "age", type: "number", label: "Age", min: 0, max: 120 },
   },
   {
-    type: "Email",
+    type: "email",
     description: "Email input with validation.",
     valueFormat: "string (valid email)",
+    defaultLabel: "Email address",
     specificProps: [
       { name: "placeholder", type: "string", required: false, description: "Placeholder when empty." },
     ],
-    exampleJson: { id: "email", type: "Email", label: "Email", required: true },
+    exampleJson: { id: "email", type: "email", label: "Email", required: true },
   },
   {
-    type: "Phone",
+    type: "phone",
     description: "Phone number input (validated as 10 digits by default).",
     valueFormat: "string",
+    defaultLabel: "Phone number",
     specificProps: [
       { name: "placeholder", type: "string", required: false, description: "Placeholder when empty." },
     ],
-    exampleJson: { id: "phone", type: "Phone", label: "Phone Number", required: true },
+    exampleJson: { id: "phone", type: "phone", label: "Phone Number", required: true },
   },
   {
-    type: "Url",
+    type: "url",
     description: "URL input with validation.",
     valueFormat: "string (valid URL)",
+    defaultLabel: "Website URL",
     specificProps: [
       { name: "placeholder", type: "string", required: false, description: "e.g. https://example.com" },
     ],
-    exampleJson: { id: "website", type: "Url", label: "Website", placeholder: "https://" },
+    exampleJson: { id: "website", type: "url", label: "Website", placeholder: "https://" },
   },
   {
-    type: "TextArea",
+    type: "textarea",
     description: "Multi-line text input.",
     valueFormat: "string",
+    defaultLabel: "Long text / description",
     specificProps: [
       { name: "placeholder", type: "string", required: false, description: "Placeholder when empty." },
       { name: "rows", type: "number", required: false, description: "Visible rows (default 4)." },
     ],
-    exampleJson: { id: "about", type: "TextArea", label: "About you", rows: 4 },
+    exampleJson: { id: "about", type: "textarea", label: "About you", rows: 4 },
   },
   {
-    type: "Select",
+    type: "select",
     description: "Dropdown single-select from options.",
     valueFormat: "string (selected option)",
+    defaultLabel: "Choose one",
     specificProps: [
       { name: "options", type: "string[]", required: true, description: "List of options." },
       { name: "placeholder", type: "string", required: false, description: "Placeholder for empty state." },
     ],
-    exampleJson: { id: "country", type: "Select", label: "Country", required: true, options: ["India", "USA", "UK"] },
+    exampleJson: { id: "country", type: "select", label: "Country", required: true, options: ["India", "USA", "UK"] },
   },
   {
-    type: "Radio",
+    type: "radio",
     description: "Single choice from options (radio buttons).",
     valueFormat: "string (selected option)",
+    defaultLabel: "Single choice",
     specificProps: [
       { name: "options", type: "string[]", required: true, description: "List of options." },
     ],
-    exampleJson: { id: "contact", type: "Radio", label: "Contact method", options: ["Email", "Phone", "Post"] },
+    exampleJson: { id: "contact", type: "radio", label: "Contact method", options: ["Email", "Phone", "Post"] },
   },
   {
-    type: "MultiSelect",
+    type: "multiselect",
     description: "Multiple choice from options (checkboxes). Value is comma-separated.",
     valueFormat: "string (comma-separated selected options, e.g. \"A,B,C\")",
+    defaultLabel: "Select all that apply",
     specificProps: [
       { name: "options", type: "string[]", required: true, description: "List of options." },
     ],
-    exampleJson: { id: "prefs", type: "MultiSelect", label: "Preferences", options: ["News", "Updates", "Marketing"] },
+    exampleJson: { id: "prefs", type: "multiselect", label: "Preferences", options: ["News", "Updates", "Marketing"] },
   },
   {
-    type: "Checkbox",
+    type: "checkbox",
     description: "Single checkbox (yes/no). Value is \"true\" or \"false\".",
     valueFormat: "\"true\" | \"false\"",
+    defaultLabel: "Checkbox",
     specificProps: [
       { name: "checkboxLabel", type: "string", required: false, description: "Label next to checkbox (default \"Yes\")." },
     ],
-    exampleJson: { id: "agreed", type: "Checkbox", label: "I agree to terms", checkboxLabel: "Yes, I agree" },
+    exampleJson: { id: "agreed", type: "checkbox", label: "I agree to terms", checkboxLabel: "Yes, I agree" },
   },
   {
-    type: "Date",
+    type: "date",
     description: "Date picker. Value is YYYY-MM-DD.",
     valueFormat: "string (YYYY-MM-DD)",
+    defaultLabel: "Date",
     specificProps: [
       { name: "min", type: "string", required: false, description: "Min date (YYYY-MM-DD)." },
       { name: "max", type: "string", required: false, description: "Max date (YYYY-MM-DD)." },
     ],
-    exampleJson: { id: "dob", type: "Date", label: "Date of birth", min: "1900-01-01", max: "2025-12-31" },
+    exampleJson: { id: "dob", type: "date", label: "Date of birth", min: "1900-01-01", max: "2025-12-31" },
   },
   {
-    type: "Time",
+    type: "time",
     description: "Time picker. Value is HH:mm or HH:mm:ss.",
     valueFormat: "string (HH:mm)",
+    defaultLabel: "Time",
     specificProps: [
       { name: "min", type: "string", required: false, description: "Min time (HH:mm)." },
       { name: "max", type: "string", required: false, description: "Max time (HH:mm)." },
     ],
-    exampleJson: { id: "appointment", type: "Time", label: "Preferred time" },
+    exampleJson: { id: "appointment", type: "time", label: "Preferred time" },
   },
 ];
 
@@ -150,3 +164,42 @@ export const PAGEDEF_STRUCTURE = {
   components: "PageComponentDef[]",
   actions: "Record<string, string> (optional) — actionId → JS function body",
 };
+
+/** Palette groups for the PageDef Builder. Drag one of these; concrete type is chosen in Config. */
+export interface PaletteSpec {
+  id: string;
+  label: string;
+  description: string;
+  /** Default component type when dropped (e.g. "text" for TextField). */
+  defaultType: string;
+  /** If set, Config panel shows a Type dropdown with these options. */
+  subTypes?: string[];
+}
+
+export const PALETTE_SPECS: PaletteSpec[] = [
+  { id: "TextField", label: "Text field", description: "Single-line text: plain, email, phone, or URL.", defaultType: "text", subTypes: ["text", "email", "phone", "url"] },
+  { id: "Number", label: "Number", description: "Numeric input with optional min/max/step.", defaultType: "number" },
+  { id: "TextArea", label: "Long text", description: "Multi-line text input.", defaultType: "textarea" },
+  { id: "Select", label: "Select", description: "Dropdown single-select from options.", defaultType: "select" },
+  { id: "Choice", label: "Choice", description: "Single or multiple choice (radio or checkboxes). Set multi in Config.", defaultType: "radio", subTypes: ["radio", "multiselect"] },
+  { id: "Checkbox", label: "Checkbox", description: "Single checkbox (yes/no).", defaultType: "checkbox" },
+  { id: "DateAndTime", label: "Date & time", description: "Date or time picker.", defaultType: "date", subTypes: ["date", "time"] },
+];
+
+/** For Config panel: which types show a Type dropdown and what options they get. */
+export const TYPE_GROUPS: Record<string, string[]> = {
+  text: ["text", "email", "phone", "url"],
+  email: ["text", "email", "phone", "url"],
+  phone: ["text", "email", "phone", "url"],
+  url: ["text", "email", "phone", "url"],
+  radio: ["radio", "multiselect"],
+  multiselect: ["radio", "multiselect"],
+  date: ["date", "time"],
+  time: ["date", "time"],
+};
+
+/** Returns the Type dropdown options for a component type, or null if not in a group. */
+export function getTypeGroup(type: string): string[] | null {
+  const group = TYPE_GROUPS[type];
+  return group ?? null;
+}

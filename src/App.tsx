@@ -5,6 +5,7 @@ import FormRenderer from "./components/form-renderer/FormRender";
 import JsonFormPlayground from "./components/form-renderer/JsonFormPlayground";
 import PageDefPlayground from "./components/form-renderer/PageDefPlayground";
 import PageDefBuilder from "./components/page-def-builder/PageDefBuilder";
+import { PageDefTemplatesPage } from "./components/page-def";
 import ComponentReference from "./reference/ComponentReference";
 import { FormSchema } from "./utils/types";
 import FormInProgressModal from "./components/FormInProgressModal";
@@ -12,7 +13,14 @@ import FormInProgressModal from "./components/FormInProgressModal";
 const App = () => {
   const [isFormSaved, setIsFormSaved] = useState(false);
   const [shouldShowAutoSave, setShouldShowAutoSave] = useState(false);
-  const [view, setView] = useState<"app" | "jsonForm" | "pageDef" | "pageDefBuilder" | "reference">("app");
+  const [view, setView] = useState<
+    | "app"
+    | "jsonForm"
+    | "pageDef"
+    | "pageDefBuilder"
+    | "templates"
+    | "reference"
+  >("app");
 
   const intialiseFormSchema = () => {
     const savedFormSchema = localStorage.getItem("formSchema");
@@ -76,6 +84,13 @@ const App = () => {
         </button>
         <button
           type="button"
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${view === "templates" ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20" : "text-slate-600 hover:bg-slate-100 hover:text-slate-800"}`}
+          onClick={() => setView("templates")}
+        >
+          Templates
+        </button>
+        <button
+          type="button"
           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${view === "reference" ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20" : "text-slate-600 hover:bg-slate-100 hover:text-slate-800"}`}
           onClick={() => setView("reference")}
         >
@@ -109,6 +124,9 @@ const App = () => {
       {view === "jsonForm" && <JsonFormPlayground />}
       {view === "pageDef" && <PageDefPlayground />}
       {view === "pageDefBuilder" && <PageDefBuilder />}
+      {view === "templates" && (
+        <PageDefTemplatesPage onOpenBuilder={() => setView("pageDefBuilder")} />
+      )}
       {view === "reference" && <ComponentReference />}
     </>
   );

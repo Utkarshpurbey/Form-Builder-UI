@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { PageDef } from "../../utils/pageDef";
-import { REGISTRY } from "./registry";
+import { REGISTRY, getVariantProps } from "./registry";
 import type { RegistryKey } from "./registry";
 import { DRAG_TYPE } from "./ComponentPalette";
 import { getDefaultComponentDef } from "./defaults";
@@ -56,8 +56,9 @@ export default function PageCanvas({
       });
       return;
     }
-    if (!type || !(type in REGISTRY)) return;
-    const def = getDefaultComponentDef(type as RegistryKey);
+    if (!type) return;
+    const def = getDefaultComponentDef(type);
+    if (!def) return;
     onPageDefChange((prev) => ({
       ...prev,
       components: [...prev.components, def],
@@ -83,19 +84,21 @@ export default function PageCanvas({
       }));
       return;
     }
-    if (type && type in REGISTRY) {
-      const def = getDefaultComponentDef(type as RegistryKey);
-      const dropIndex = pageDef.components.findIndex((c) => c.id === dropTargetId);
-      if (dropIndex === -1) return;
-      onPageDefChange((prev) => ({
-        ...prev,
-        components: [
-          ...prev.components.slice(0, dropIndex),
-          def,
-          ...prev.components.slice(dropIndex),
-        ],
-      }));
-      onSelect(def.id);
+    if (type) {
+      const def = getDefaultComponentDef(type);
+      if (def) {
+        const dropIndex = pageDef.components.findIndex((c) => c.id === dropTargetId);
+        if (dropIndex === -1) return;
+        onPageDefChange((prev) => ({
+          ...prev,
+          components: [
+            ...prev.components.slice(0, dropIndex),
+            def,
+            ...prev.components.slice(dropIndex),
+          ],
+        }));
+        onSelect(def.id);
+      }
     }
   };
 
@@ -161,8 +164,9 @@ export default function PageCanvas({
               value,
               onChange: handleChange(id),
               ...rawProps,
+              ...getVariantProps(type),
             };
-            if ((type === "Select" || type === "Radio" || type === "MultiSelect") && !Array.isArray(props.options))
+            if ((type === "select" || type === "radio" || type === "multiselect") && !Array.isArray(props.options))
               props.options = [];
 
             return (

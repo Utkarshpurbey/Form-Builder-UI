@@ -1,5 +1,5 @@
 import type { PageDef, PageComponentDef } from "../../utils/pageDef";
-import { COMPONENT_SPECS } from "../../reference/component-reference-data";
+import { COMPONENT_SPECS, getTypeGroup } from "../../reference/component-reference-data";
 
 const inputClass =
   "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400";
@@ -84,13 +84,34 @@ export default function ComponentConfigPanel({
           <p className="text-xs text-slate-500 mt-0.5">Auto-generated as type + short id; you can edit.</p>
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Type (read-only)</label>
-          <input
-            type="text"
-            value={String(comp.type ?? "")}
-            disabled
-            className={inputClass + " opacity-70 bg-slate-50 cursor-not-allowed"}
-          />
+          <label className="block text-xs font-medium text-slate-600 mb-1">Type</label>
+          {(() => {
+            const typeGroup = getTypeGroup(String(comp.type ?? ""));
+            if (typeGroup && typeGroup.length > 0) {
+              return (
+                <select
+                  value={String(comp.type ?? "")}
+                  onChange={(e) => updateSelected({ type: e.target.value as PageComponentDef["type"] })}
+                  className={inputClass}
+                >
+                  {typeGroup.map((t) => (
+                    <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                  ))}
+                </select>
+              );
+            }
+            return (
+              <input
+                type="text"
+                value={String(comp.type ?? "")}
+                disabled
+                className={inputClass + " opacity-70 bg-slate-50 cursor-not-allowed"}
+              />
+            );
+          })()}
+          {getTypeGroup(String(comp.type ?? "")) && (
+            <p className="text-xs text-slate-500 mt-0.5">Change type in this group</p>
+          )}
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">Label</label>
@@ -133,15 +154,32 @@ export default function ComponentConfigPanel({
             />
           </div>
         )}
-        {(selectedComponent.type === "Select" ||
-          selectedComponent.type === "Radio" ||
-          selectedComponent.type === "MultiSelect") && (
-          <OptionsEditor
-            options={Array.isArray(comp.options) ? (comp.options as string[]) : []}
-            onChange={(options) => updateSelected({ options })}
-          />
+        {(selectedComponent.type === "select" ||
+          selectedComponent.type === "radio" ||
+          selectedComponent.type === "multiselect") && (
+          <>
+            <OptionsEditor
+              options={Array.isArray(comp.options) ? (comp.options as string[]) : []}
+              onChange={(options) => updateSelected({ options })}
+            />
+            {(selectedComponent.type === "radio" || selectedComponent.type === "multiselect") && (
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedComponent.type === "multiselect"}
+                  onChange={(e) =>
+                    updateSelected(
+                      e.target.checked ? { type: "multiselect" } : { type: "radio" }
+                    )
+                  }
+                  className="size-4 rounded border-slate-300 text-indigo-600"
+                />
+                <span className="text-sm text-slate-700">Multi select (checkboxes)</span>
+              </label>
+            )}
+          </>
         )}
-        {selectedComponent.type === "TextArea" && (
+        {selectedComponent.type === "textarea" && (
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Rows</label>
             <input
@@ -153,7 +191,7 @@ export default function ComponentConfigPanel({
             />
           </div>
         )}
-        {selectedComponent.type === "Checkbox" && (
+        {selectedComponent.type === "checkbox" && (
           <div>
             <label className="block text-xs font-medium text-slate-600 mb-1">Checkbox label</label>
             <input
@@ -164,34 +202,34 @@ export default function ComponentConfigPanel({
             />
           </div>
         )}
-        {(selectedComponent.type === "Number" || selectedComponent.type === "Date" || selectedComponent.type === "Time") && (
+        {(selectedComponent.type === "number" || selectedComponent.type === "date" || selectedComponent.type === "time") && (
           <>
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Min</label>
               <input
-                type={selectedComponent.type === "Number" ? "number" : "text"}
+                type={selectedComponent.type === "number" ? "number" : "text"}
                 value={comp.min != null ? String(comp.min) : ""}
                 onChange={(e) =>
                   updateSelected({
-                    min: selectedComponent.type === "Number" ? (e.target.value ? Number(e.target.value) : undefined) : e.target.value || undefined,
+                    min: selectedComponent.type === "number" ? (e.target.value ? Number(e.target.value) : undefined) : e.target.value || undefined,
                   })
                 }
                 className={inputClass}
-                placeholder={selectedComponent.type === "Number" ? undefined : "e.g. 1900-01-01"}
+                placeholder={selectedComponent.type === "number" ? undefined : "e.g. 1900-01-01"}
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Max</label>
               <input
-                type={selectedComponent.type === "Number" ? "number" : "text"}
+                type={selectedComponent.type === "number" ? "number" : "text"}
                 value={comp.max != null ? String(comp.max) : ""}
                 onChange={(e) =>
                   updateSelected({
-                    max: selectedComponent.type === "Number" ? (e.target.value ? Number(e.target.value) : undefined) : e.target.value || undefined,
+                    max: selectedComponent.type === "number" ? (e.target.value ? Number(e.target.value) : undefined) : e.target.value || undefined,
                   })
                 }
                 className={inputClass}
-                placeholder={selectedComponent.type === "Number" ? undefined : "e.g. 2025-12-31"}
+                placeholder={selectedComponent.type === "number" ? undefined : "e.g. 2025-12-31"}
               />
             </div>
           </>

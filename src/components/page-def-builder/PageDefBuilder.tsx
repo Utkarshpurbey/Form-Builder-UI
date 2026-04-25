@@ -1,8 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { toast } from "react-toastify";
 import type { PageDef } from "../../utils/pageDef";
 import ComponentPalette from "./ComponentPalette";
 import PageCanvas from "./PageCanvas";
 import ComponentConfigPanel from "./ComponentConfigPanel";
+
+export const SAVED_PAGE_DEF_KEY = "savedPageDef";
+export const INJECTED_PAGE_DEF_TEMPLATE_KEY = "injectedPageDefTemplate";
 
 const INITIAL_PAGE_DEF: PageDef = {
   id: "page-1",
@@ -12,6 +16,8 @@ const INITIAL_PAGE_DEF: PageDef = {
 };
 
 type CenterView = "preview" | "json";
+
+const DEBOUNCE_MS = 400;
 
 export default function PageDefBuilder() {
   const [pageDef, setPageDef] = useState<PageDef>(INITIAL_PAGE_DEF);
@@ -24,28 +30,63 @@ export default function PageDefBuilder() {
     setJsonInput(JSON.stringify(pageDef, null, 2));
   }, [pageDef]);
 
+  useEffect(() => {
+    const injectedTemplate = localStorage.getItem(INJECTED_PAGE_DEF_TEMPLATE_KEY);
+    if (!injectedTemplate) return;
+
+    try {
+      const parsed = JSON.parse(injectedTemplate) as PageDef;
+      if (!parsed?.id || !parsed?.title || !Array.isArray(parsed.components)) {
+        throw new Error("Template format is invalid.");
+      }
+      setPageDef(parsed);
+      setSelectedId(null);
+      setCenterView("preview");
+      setJsonError(null);
+      toast.success("Template loaded into PageDef Builder.");
+    } catch {
+      toast.error("Could not load selected template.");
+    } finally {
+      localStorage.removeItem(INJECTED_PAGE_DEF_TEMPLATE_KEY);
+    }
+  }, []);
+
+  // Apply JSON changes directly (debounced) when in JSON view
+  useEffect(() => {
+    if (centerView !== "json") return;
+    const t = setTimeout(() => {
+      setJsonError(null);
+      try {
+        const parsed = JSON.parse(jsonInput) as PageDef;
+        if (!parsed?.id || !parsed?.title || !Array.isArray(parsed.components)) {
+          throw new Error("Need id, title, and components array.");
+        }
+        setPageDef(parsed);
+      } catch (e) {
+        setJsonError(e instanceof Error ? e.message : "Invalid JSON");
+      }
+    }, DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [centerView, jsonInput]);
+
   const selectedComponent =
     pageDef.components.find((c) => c.id === selectedId) ?? null;
 
-  const deleteSelected = () => {
+  const deleteSelected = useCallback(() => {
     if (!selectedId) return;
     setPageDef((prev) => ({
       ...prev,
       components: prev.components.filter((c) => c.id !== selectedId),
     }));
     setSelectedId(null);
-  };
+  }, [selectedId]);
 
-  const handleApplyJson = () => {
-    setJsonError(null);
+  const handleSave = () => {
     try {
-      const parsed = JSON.parse(jsonInput) as PageDef;
-      if (!parsed?.id || !parsed?.title || !Array.isArray(parsed.components)) {
-        throw new Error("Need id, title, and components array.");
-      }
-      setPageDef(parsed);
-    } catch (e) {
-      setJsonError(e instanceof Error ? e.message : "Invalid JSON");
+      localStorage.setItem(SAVED_PAGE_DEF_KEY, JSON.stringify(pageDef, null, 2));
+      toast.success("PageDef saved. Open \"JSON PageDef\" in the nav to test the form.");
+    } catch {
+      toast.error("Failed to save PageDef.");
     }
   };
 
@@ -55,7 +96,8 @@ export default function PageDefBuilder() {
         <ComponentPalette />
       </aside>
       <main className="flex-1 min-w-0 p-4 overflow-hidden flex flex-col">
-        <div className="flex gap-1 mb-3">
+        <div className="flex gap-1 mb-3 items-center justify-between">
+          <div className="flex gap-1">
           <button
             type="button"
             onClick={() => setCenterView("preview")}
@@ -78,6 +120,14 @@ export default function PageDefBuilder() {
           >
             JSON
           </button>
+          </div>
+          <button
+            type="button"
+            onClick={handleSave}
+            className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-600 text-white shadow-md hover:bg-emerald-700"
+          >
+            Save
+          </button>
         </div>
         {centerView === "preview" ? (
           <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
@@ -90,15 +140,8 @@ export default function PageDefBuilder() {
           </div>
         ) : (
           <div className="flex-1 min-h-0 flex flex-col bg-white rounded-2xl border border-slate-200 overflow-hidden">
-            <div className="p-3 border-b border-slate-200 flex items-center justify-between gap-2">
-              <span className="text-sm text-slate-600">PageDef JSON — edit and Apply to update the form</span>
-              <button
-                type="button"
-                onClick={handleApplyJson}
-                className="px-3 py-1.5 rounded-lg bg-indigo-600 text-white text-sm font-medium hover:bg-indigo-700"
-              >
-                Apply
-              </button>
+            <div className="p-3 border-b border-slate-200">
+              <span className="text-sm text-slate-600">PageDef JSON — edits update the form automatically</span>
             </div>
             <textarea
               value={jsonInput}

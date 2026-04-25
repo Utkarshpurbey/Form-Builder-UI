@@ -1,16 +1,16 @@
 export type PageComponentType =
-  | "Text"
-  | "Number"
-  | "Email"
-  | "Phone"
-  | "TextArea"
-  | "Select"
-  | "Checkbox"
-  | "Radio"
-  | "Date"
-  | "Time"
-  | "MultiSelect"
-  | "Url";
+  | "text"
+  | "number"
+  | "email"
+  | "phone"
+  | "textarea"
+  | "select"
+  | "checkbox"
+  | "radio"
+  | "date"
+  | "time"
+  | "multiselect"
+  | "url";
 
 export interface PageComponentDef {
   id: string;
