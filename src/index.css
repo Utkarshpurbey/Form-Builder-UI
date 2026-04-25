@@ -4,6 +4,7 @@
 @layer base {
   html {
     @apply antialiased;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   }
   body {
     @apply text-slate-800 bg-slate-50;
