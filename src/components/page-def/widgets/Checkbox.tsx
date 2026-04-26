@@ -38,10 +38,10 @@ export const Checkbox = ({
           checked={checked}
           onChange={(e) => onChange(e.target.checked ? "true" : "false")}
           disabled={disabled}
-          className="size-5 rounded border-2 border-slate-300 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-0 disabled:opacity-60"
+          className="size-5 rounded border-2 border-[color:var(--fb-input-border,#cbd5e1)] text-[color:var(--fb-primary,#4f46e5)] focus:outline-none focus:ring-2 focus:ring-[color:var(--fb-ring)] focus:ring-offset-2 focus:ring-offset-[color:var(--fb-surface,white)] disabled:opacity-60"
           aria-invalid={!!error}
         />
-        <span className="text-slate-700 select-none group-hover:text-slate-900">
+        <span className="text-[0.9375rem] text-[color:var(--fb-text,#0f172a)] select-none opacity-90 group-hover:opacity-100">
           {checkboxLabel}
         </span>
       </label>

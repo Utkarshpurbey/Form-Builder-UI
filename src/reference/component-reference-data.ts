@@ -13,7 +13,7 @@ export const BASE_PROPS_DOC = {
   onChange: {
     type: "string",
     required: false,
-    description: "Action reference, e.g. \"@actionDef.logName\". Runs when value changes.",
+    description: "Optional action ref, e.g. \"@actionDef.myAction\" — runs JS from the page actions map when the value changes.",
   },
 } as const;
 
@@ -21,7 +21,7 @@ export interface ComponentSpec {
   type: string;
   description: string;
   valueFormat: string;
-  /** Default label shown in PageDef Builder when this component is added. */
+  /** Default label shown in Formvity when this component is added. */
   defaultLabel: string;
   specificProps: { name: string; type: string; required: boolean; description: string }[];
   exampleJson: object;
@@ -157,15 +157,27 @@ export const COMPONENT_SPECS: ComponentSpec[] = [
   },
 ];
 
+/** Shown in the docs as a shape guide (not exhaustive). */
 export const PAGEDEF_STRUCTURE = {
   id: "string",
-  title: "string",
-  description: "string (optional)",
+  title: "string — main heading in the form header",
+  description: "string (optional) — subtitle / instructions; multi-line in the visual builder",
+  formSettings: {
+    appearance: {
+      primaryColor: "hex — accent, focus rings, primary button",
+      backgroundColor: "hex — page behind the form card",
+      surfaceColor: "hex — form card background",
+      textColor: "hex — title and field text",
+      borderRadius: '"sm" | "md" | "lg"',
+      submitStyle: '"solid" | "soft" | "outline"',
+      inputStyle: '"outline" | "filled"',
+    },
+  },
   components: "PageComponentDef[]",
-  actions: "Record<string, string> (optional) — actionId → JS function body",
+  actions: "Record<string, string> (optional) — actionId → JS body; used with onChange @actionDef.* refs",
 };
 
-/** Palette groups for the PageDef Builder. Drag one of these; concrete type is chosen in Config. */
+/** Palette groups for Formvity. Drag one of these; concrete type is chosen in Config. */
 export interface PaletteSpec {
   id: string;
   label: string;

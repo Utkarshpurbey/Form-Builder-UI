@@ -1,10 +1,92 @@
-import type { PageDef, PageComponentDef } from "./pageDef";
+import type { FormAppearanceSettings, PageDef, PageComponentDef } from "./pageDef";
 import { COMPONENT_SPECS, getTypeGroup } from "../../../reference/component-reference-data";
 
 const inputClass =
   "w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400";
 
+const APPEARANCE_PRESETS: { name: string; tag: string; appearance: FormAppearanceSettings }[] = [
+  {
+    name: "Indigo",
+    tag: "SaaS",
+    appearance: {
+      primaryColor: "#4f46e5",
+      backgroundColor: "#eef2ff",
+      surfaceColor: "#ffffff",
+      textColor: "#0f172a",
+      borderRadius: "md",
+      submitStyle: "solid",
+      inputStyle: "outline",
+    },
+  },
+  {
+    name: "Teal",
+    tag: "Care",
+    appearance: {
+      primaryColor: "#0d9488",
+      backgroundColor: "#ecfdf5",
+      surfaceColor: "#ffffff",
+      textColor: "#0f172a",
+      borderRadius: "lg",
+      submitStyle: "soft",
+      inputStyle: "filled",
+    },
+  },
+  {
+    name: "Rose",
+    tag: "Bold",
+    appearance: {
+      primaryColor: "#e11d48",
+      backgroundColor: "#fff1f2",
+      surfaceColor: "#ffffff",
+      textColor: "#1e1b4b",
+      borderRadius: "lg",
+      submitStyle: "solid",
+      inputStyle: "outline",
+    },
+  },
+  {
+    name: "Amber",
+    tag: "Warm",
+    appearance: {
+      primaryColor: "#d97706",
+      backgroundColor: "#fffbeb",
+      surfaceColor: "#ffffff",
+      textColor: "#1c1917",
+      borderRadius: "md",
+      submitStyle: "outline",
+      inputStyle: "outline",
+    },
+  },
+  {
+    name: "Midnight",
+    tag: "Dark",
+    appearance: {
+      primaryColor: "#38bdf8",
+      backgroundColor: "#0f172a",
+      surfaceColor: "#1e293b",
+      textColor: "#f8fafc",
+      borderRadius: "md",
+      submitStyle: "solid",
+      inputStyle: "filled",
+    },
+  },
+  {
+    name: "Slate",
+    tag: "Editorial",
+    appearance: {
+      primaryColor: "#0f172a",
+      backgroundColor: "#f1f5f9",
+      surfaceColor: "#ffffff",
+      textColor: "#0f172a",
+      borderRadius: "sm",
+      submitStyle: "outline",
+      inputStyle: "outline",
+    },
+  },
+];
+
 interface ComponentConfigPanelProps {
+  pageDef: PageDef;
   selectedComponent: PageComponentDef | null;
   onPageDefChange: (updater: (prev: PageDef) => PageDef) => void;
   onClearSelection: () => void;
@@ -12,6 +94,7 @@ interface ComponentConfigPanelProps {
 }
 
 export default function ComponentConfigPanel({
+  pageDef,
   selectedComponent,
   onPageDefChange,
   onClearSelection,
@@ -28,15 +111,149 @@ export default function ComponentConfigPanel({
   };
 
   if (!selectedComponent) {
+    const appearance = pageDef.formSettings?.appearance ?? {};
+    const updateAppearance = (updates: Record<string, unknown>) => {
+      onPageDefChange((prev) => ({
+        ...prev,
+        formSettings: {
+          ...prev.formSettings,
+          appearance: {
+            ...(prev.formSettings?.appearance ?? {}),
+            ...updates,
+          },
+        },
+      }));
+    };
+
+    const applyPreset = (preset: FormAppearanceSettings) => {
+      onPageDefChange((prev) => ({
+        ...prev,
+        formSettings: {
+          ...prev.formSettings,
+          appearance: { ...preset },
+        },
+      }));
+    };
+
     return (
-      <div className="flex flex-col h-full min-h-0 bg-white">
-        <header className="shrink-0 px-4 py-3 border-b border-slate-200 bg-white">
-          <h2 className="text-sm font-semibold text-slate-800">Config</h2>
-          <p className="text-xs text-slate-500 mt-0.5">Page settings</p>
+      <div className="flex h-full min-h-0 flex-col bg-gradient-to-b from-slate-50 to-white">
+        <header className="shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-sm">
+          <h2 className="text-sm font-semibold text-slate-900">Look &amp; feel</h2>
+          <p className="mt-0.5 text-xs leading-relaxed text-slate-500">
+            Curated themes first — then fine-tune. This is what respondents see in preview.
+          </p>
         </header>
-        <div className="flex-1 overflow-auto p-4 space-y-3">
-          <p className="text-xs text-slate-500">Edit title and description in the canvas header.</p>
-          <p className="text-xs text-slate-500">Select a component on the canvas to edit its props here.</p>
+        <div className="min-h-0 flex-1 space-y-5 overflow-auto p-4">
+          <div>
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Themes</p>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              {APPEARANCE_PRESETS.map((p) => (
+                <button
+                  key={p.name}
+                  type="button"
+                  onClick={() => applyPreset(p.appearance)}
+                  className="group overflow-hidden rounded-xl border border-slate-200/90 bg-white text-left shadow-sm transition hover:border-indigo-300 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                >
+                  <div
+                    className="relative h-11 w-full"
+                    style={{ background: p.appearance.backgroundColor ?? "#f8fafc" }}
+                  >
+                    <div
+                      className="absolute bottom-2 left-2 flex h-7 w-[calc(100%-1rem)] items-center gap-2 rounded-md px-2 shadow-sm ring-1 ring-black/5"
+                      style={{ background: p.appearance.surfaceColor ?? "#fff" }}
+                    >
+                      <span
+                        className="size-2.5 shrink-0 rounded-full shadow-inner ring-1 ring-black/10"
+                        style={{ background: p.appearance.primaryColor ?? "#4f46e5" }}
+                        aria-hidden
+                      />
+                      <span className="truncate text-[11px] font-semibold text-slate-800">{p.name}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between px-2.5 py-2">
+                    <span className="text-[10px] font-medium uppercase tracking-wide text-slate-400">{p.tag}</span>
+                    <span className="text-[10px] font-semibold text-indigo-600 opacity-0 transition group-hover:opacity-100">
+                      Apply
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200/80 bg-white p-3 shadow-sm">
+            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">Custom colors</p>
+            <div className="mt-3 space-y-3">
+              <ColorRow
+                label="Accent"
+                value={String(appearance.primaryColor ?? "#4f46e5")}
+                onChange={(v) => updateAppearance({ primaryColor: v })}
+              />
+              <ColorRow
+                label="Page"
+                value={String(appearance.backgroundColor ?? "#eef2ff")}
+                onChange={(v) => updateAppearance({ backgroundColor: v })}
+              />
+              <ColorRow
+                label="Card"
+                value={String(appearance.surfaceColor ?? "#ffffff")}
+                onChange={(v) => updateAppearance({ surfaceColor: v })}
+              />
+              <ColorRow
+                label="Text"
+                value={String(appearance.textColor ?? "#0f172a")}
+                onChange={(v) => updateAppearance({ textColor: v })}
+              />
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <div>
+              <label className="mb-1 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Corners
+              </label>
+              <select
+                value={String(appearance.borderRadius ?? "md")}
+                onChange={(e) => updateAppearance({ borderRadius: e.target.value })}
+                className={inputClass}
+              >
+                <option value="sm">Tight</option>
+                <option value="md">Balanced</option>
+                <option value="lg">Soft</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Primary button
+              </label>
+              <select
+                value={String(appearance.submitStyle ?? "solid")}
+                onChange={(e) => updateAppearance({ submitStyle: e.target.value })}
+                className={inputClass}
+              >
+                <option value="solid">Solid + glow</option>
+                <option value="soft">Soft tint</option>
+                <option value="outline">Outline</option>
+              </select>
+            </div>
+            <div>
+              <label className="mb-1 block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                Fields
+              </label>
+              <select
+                value={String(appearance.inputStyle ?? "outline")}
+                onChange={(e) => updateAppearance({ inputStyle: e.target.value })}
+                className={inputClass}
+              >
+                <option value="outline">Outline</option>
+                <option value="filled">Filled</option>
+              </select>
+            </div>
+          </div>
+
+          <p className="rounded-lg bg-slate-50 px-3 py-2 text-[11px] leading-relaxed text-slate-500">
+            Select a field on the canvas to edit labels, validation, and options.
+          </p>
         </div>
       </div>
     );
@@ -235,6 +452,41 @@ export default function ComponentConfigPanel({
           </>
         )}
       </div>
+    </div>
+  );
+}
+
+function ColorRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (hex: string) => void;
+}) {
+  const safe = /^#[0-9a-fA-F]{6}$/i.test(value.trim()) ? value.trim() : "#4f46e5";
+  return (
+    <div className="flex items-center gap-2">
+      <span className="w-14 shrink-0 text-[11px] font-medium text-slate-600">{label}</span>
+      <input
+        type="color"
+        aria-label={`${label} color`}
+        value={safe}
+        onChange={(e) => onChange(e.target.value)}
+        className="size-9 shrink-0 cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-white p-0.5 shadow-inner"
+      />
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={() => {
+          const t = value.trim();
+          if (/^#[0-9a-fA-F]{6}$/i.test(t)) onChange(t);
+        }}
+        spellCheck={false}
+        className={`${inputClass} flex-1 font-mono text-xs`}
+      />
     </div>
   );
 }

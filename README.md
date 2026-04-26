@@ -48,4 +48,6 @@ export default tseslint.config({
   },
 })
 ```
-# Form-Builder-UI
+# Formvity
+
+Branded form builder UI (React + TypeScript + Vite).

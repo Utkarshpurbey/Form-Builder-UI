@@ -39,8 +39,8 @@ const App = () => {
               </svg>
             </div>
             <div className="min-w-0">
-              <h1 className="text-base font-bold tracking-tight text-slate-900 sm:text-lg">Form Builder</h1>
-              <p className="mt-0.5 hidden text-xs text-slate-500 sm:block">Customizable forms platform for modern teams</p>
+              <h1 className="text-base font-bold tracking-tight text-slate-900 sm:text-lg">Formvity</h1>
+              <p className="mt-0.5 hidden text-xs text-slate-500 sm:block">Branded forms, built your way</p>
             </div>
           </div>
           <nav

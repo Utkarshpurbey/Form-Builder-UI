@@ -3,6 +3,16 @@ import { toast } from "react-toastify";
 import type { PageDef, PageComponentDef, PageComponentType } from "./builder/pageDef";
 import { REGISTRY, getVariantProps } from "./builder/registry";
 import { SAVED_PAGE_DEF_KEY } from "./builder/PageDefBuilder";
+import { FormHeader } from "./builder/FormHeader";
+import {
+  formAccentBarClass,
+  formCardShellClass,
+  getAppearance,
+  getAppearanceStyles,
+  getFormCardBoxShadow,
+  getInputChromeParentClass,
+  getSubmitButtonClass,
+} from "./builder/appearance";
 
 const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const validatePhone = (phone: string) => /^\d{10}$/.test(phone);
@@ -20,6 +30,17 @@ const EXAMPLE_PAGE_DEF: PageDef = {
   id: "page-1",
   title: "JSON PageDef",
   description: "Edit JSON on the left. Use \"onChange\": \"@actionDef.logName\" to run actions.",
+  formSettings: {
+    appearance: {
+      primaryColor: "#4f46e5",
+      backgroundColor: "#eef2ff",
+      surfaceColor: "#ffffff",
+      textColor: "#0f172a",
+      borderRadius: "md",
+      submitStyle: "solid",
+      inputStyle: "outline",
+    },
+  },
   components: [
     { id: "name", type: "text", label: "Full Name", required: true, onChange: "@actionDef.logName" },
     { id: "age", type: "number", label: "Age", min: 0, max: 120 },
@@ -177,10 +198,15 @@ export default function JsonPlayground() {
     if ((type === "select" || type === "radio" || type === "multiselect") && !Array.isArray(props.options)) props.options = [];
 
     return (
-      <div key={id}>
+      <div
+        key={id}
+        className="rounded-[calc(var(--fb-radius)*0.92)] border border-[color:color-mix(in_srgb,var(--fb-text)_7%,var(--fb-surface))] bg-[color:color-mix(in_srgb,var(--fb-text)_2.5%,var(--fb-surface))] p-4 shadow-sm sm:p-5"
+      >
         <Component {...(props as Record<string, unknown>)} />
         {fieldErrors[id] && (
-          <p className="mt-1 text-sm text-rose-600" role="alert">{fieldErrors[id]}</p>
+          <p className="mt-2 text-sm text-rose-600" role="alert">
+            {fieldErrors[id]}
+          </p>
         )}
       </div>
     );
@@ -188,6 +214,11 @@ export default function JsonPlayground() {
 
   const panelInput =
     "w-full h-[400px] px-4 py-3 rounded-xl border-2 border-slate-200 bg-white font-mono text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10";
+
+  const appearance = getAppearance(pageDef);
+  const appearanceVars = getAppearanceStyles(pageDef);
+  const inputChromeParent = getInputChromeParentClass(appearance);
+  const submitButtonClass = getSubmitButtonClass(appearance);
 
   return (
     <div className="flex flex-col md:flex-row gap-6 p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto bg-gradient-to-b from-slate-50 to-slate-100/80">
@@ -210,7 +241,7 @@ export default function JsonPlayground() {
           </div>
           {showSavedBanner && (
             <p className="text-sm text-emerald-700 mt-2 rounded-lg bg-emerald-50 border border-emerald-100 px-3 py-2">
-              Loaded from <strong>Visual builder</strong> (local save). Edit JSON and click Apply to re-render, or use{" "}
+              Loaded from <strong>Formvity</strong> (local save). Edit JSON and click Apply to re-render, or use{" "}
               <strong>Reset example</strong> for the demo page.
             </p>
           )}
@@ -248,28 +279,46 @@ export default function JsonPlayground() {
           </div>
         </div>
       </div>
-      <div className="md:w-1/2 space-y-4 min-h-0 flex flex-col overflow-hidden">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500 shrink-0">Live page</p>
-        <div className="flex-1 min-h-0 overflow-y-auto space-y-6">
-        <div className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{pageDef.title}</h1>
-          {pageDef.description && (
-            <p className="text-slate-500 mt-2 leading-relaxed">{pageDef.description}</p>
-          )}
-          <div className="mt-6 space-y-5">{pageDef.components.map(renderComp)}</div>
-          <div className="mt-6">
-            <button
-              type="button"
-              onClick={handleSubmit}
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-indigo-600 text-white font-medium shadow-lg shadow-indigo-500/25 hover:bg-indigo-700 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 flex items-center justify-center gap-2"
+      <div className="flex min-h-0 flex-1 flex-col space-y-3 overflow-hidden md:w-1/2">
+        <p className="shrink-0 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Live page</p>
+        <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+          <div
+            className="relative overflow-hidden rounded-[1.2rem] border border-slate-300/30 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] sm:p-4"
+            style={{
+              ...appearanceVars,
+              backgroundColor: "var(--fb-bg)",
+              color: "var(--fb-text)",
+            }}
+          >
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse 130% 75% at 50% -28%, color-mix(in srgb, var(--fb-primary) 30%, transparent), transparent 52%)",
+              }}
+            />
+            <div
+              className={`relative ${formCardShellClass} overflow-hidden bg-[color:var(--fb-surface)] text-[color:var(--fb-text)]`}
+              style={{ boxShadow: getFormCardBoxShadow(pageDef) }}
             >
-              <svg className="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-              <span>Submit Form</span>
-            </button>
+              <div className={formAccentBarClass} />
+              <FormHeader variant="static" pageDef={pageDef} />
+              <div className={`space-y-5 px-5 py-6 sm:space-y-6 sm:px-8 sm:py-8 ${inputChromeParent}`}>
+                {pageDef.components.map(renderComp)}
+                <div className="border-t border-[color:color-mix(in_srgb,var(--fb-text)_8%,var(--fb-surface))] pt-6 sm:pt-7">
+                  <button type="button" onClick={handleSubmit} className={submitButtonClass}>
+                    <svg className="size-5 shrink-0 opacity-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    <span>Submit</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+        <div className="mt-4 shrink-0 space-y-4">
         {submittedValues ? (
           <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-800 mb-4">Submitted Values</h2>

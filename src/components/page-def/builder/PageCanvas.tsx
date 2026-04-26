@@ -4,6 +4,16 @@ import { REGISTRY, getVariantProps } from "./registry";
 import type { RegistryKey } from "./registry";
 import { DRAG_TYPE } from "./ComponentPalette";
 import { getDefaultComponentDef } from "./defaults";
+import { FormHeader } from "./FormHeader";
+import {
+  formAccentBarClass,
+  formCardShellClass,
+  getAppearance,
+  getAppearanceStyles,
+  getFormCardBoxShadow,
+  getInputChromeParentClass,
+  getSubmitButtonClass,
+} from "./appearance";
 
 const DRAG_COMPONENT_ID = "application/x-pagedef-component-id";
 
@@ -32,6 +42,10 @@ export default function PageCanvas({
   onSelect,
   onPageDefChange,
 }: PageCanvasProps) {
+  const appearance = getAppearance(pageDef);
+  const appearanceVars = getAppearanceStyles(pageDef);
+  const inputChromeParent = getInputChromeParentClass(appearance);
+  const submitButtonClass = getSubmitButtonClass(appearance);
   const [values, setValues] = useState<Record<string, string>>({});
   const [dragOver, setDragOver] = useState(false);
   const [dropZoneOver, setDropZoneOver] = useState<string | null>(null);
@@ -114,38 +128,47 @@ export default function PageCanvas({
   };
 
   return (
-    <div className="flex flex-col min-h-0 flex-1 bg-slate-50/50 rounded-2xl border-2 border-dashed border-slate-200 overflow-hidden">
-      <div className="p-4 border-b border-slate-200 bg-white shrink-0">
-        <input
-          type="text"
-          value={pageDef.title}
-          onChange={(e) =>
-            onPageDefChange((prev) => ({ ...prev, title: e.target.value }))
-          }
-          placeholder="Page title"
-          className="w-full text-lg font-semibold text-slate-800 bg-transparent focus:outline-none placeholder:text-slate-400"
-        />
-        <input
-          type="text"
-          value={pageDef.description ?? ""}
-          onChange={(e) =>
-            onPageDefChange((prev) => ({ ...prev, description: e.target.value || undefined }))
-          }
-          placeholder="Description (optional)"
-          className="w-full mt-1 text-sm text-slate-500 bg-transparent focus:outline-none placeholder:text-slate-400"
-        />
-      </div>
+    <div
+      className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.2rem] border border-slate-300/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]"
+      style={{
+        ...appearanceVars,
+        backgroundColor: "var(--fb-bg)",
+        color: "var(--fb-text)",
+      }}
+    >
       <div
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-        className={`flex-1 min-h-0 overflow-auto p-4 pb-8 transition-colors ${
-          dragOver ? "bg-indigo-50/80" : ""
-        }`}
-      >
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 130% 75% at 50% -28%, color-mix(in srgb, var(--fb-primary) 30%, transparent), transparent 52%)",
+        }}
+      />
+      <div className="relative flex min-h-0 flex-1 flex-col p-3 sm:p-4">
+        <div
+          className={`${formCardShellClass} flex min-h-0 flex-1 flex-col overflow-hidden bg-[color:var(--fb-surface)] text-[color:var(--fb-text)]`}
+          style={{ boxShadow: getFormCardBoxShadow(pageDef) }}
+        >
+          <div className={formAccentBarClass} />
+          <FormHeader
+            variant="editable"
+            pageDef={pageDef}
+            onTitleChange={(title) => onPageDefChange((prev) => ({ ...prev, title }))}
+            onDescriptionChange={(description) =>
+              onPageDefChange((prev) => ({ ...prev, description }))
+            }
+          />
+          <div
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className={`relative flex min-h-0 flex-1 flex-col overflow-auto px-4 py-4 pb-6 transition-colors duration-200 sm:px-6 sm:py-5 ${inputChromeParent} ${
+              dragOver ? "bg-[color:color-mix(in_srgb,var(--fb-primary)_7%,var(--fb-surface))]" : ""
+            }`}
+          >
         {pageDef.components.length === 0 && (
-          <div className="flex items-center justify-center min-h-[280px] text-slate-400 text-sm">
-            Drop components here
+          <div className="flex min-h-[220px] items-center justify-center text-center text-sm text-[color:var(--fb-muted)]">
+            Drag fields from the palette onto this form.
           </div>
         )}
         <div className="space-y-0">
@@ -230,13 +253,23 @@ export default function PageCanvas({
                   >
                     <svg className="size-4" fill="currentColor" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.5"/><circle cx="9" cy="12" r="1.5"/><circle cx="9" cy="18" r="1.5"/><circle cx="15" cy="6" r="1.5"/><circle cx="15" cy="12" r="1.5"/><circle cx="15" cy="18" r="1.5"/></svg>
                   </span>
-                  <div className="flex-1 min-w-0 p-4 pt-3 bg-white rounded-xl">
+                  <div className="flex-1 min-w-0 rounded-[calc(var(--fb-radius)*0.92)] border border-[color:color-mix(in_srgb,var(--fb-text)_7%,var(--fb-surface))] bg-[color:color-mix(in_srgb,var(--fb-text)_2.5%,var(--fb-surface))] p-3.5 shadow-sm sm:p-4">
                     <Component {...props} />
                   </div>
                 </div>
               </div>
             );
           })}
+        </div>
+            <div className="mt-6 border-t border-[color:color-mix(in_srgb,var(--fb-text)_8%,var(--fb-surface))] px-0 pt-5 sm:pt-6">
+              <button type="button" className={submitButtonClass} onClick={() => undefined}>
+                Continue
+              </button>
+              <p className="mt-2 text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-[color:var(--fb-muted)]">
+                Primary action preview
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

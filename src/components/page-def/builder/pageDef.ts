@@ -22,11 +22,26 @@ export interface PageComponentDef {
   [prop: string]: unknown;
 }
 
+export interface FormAppearanceSettings {
+  primaryColor?: string;
+  backgroundColor?: string;
+  surfaceColor?: string;
+  textColor?: string;
+  borderRadius?: "sm" | "md" | "lg";
+  submitStyle?: "solid" | "soft" | "outline";
+  inputStyle?: "outline" | "filled";
+}
+
+export interface FormSettings {
+  appearance?: FormAppearanceSettings;
+}
+
 export interface PageDef {
   id: string;
   title: string;
   description?: string;
   components: PageComponentDef[];
+  formSettings?: FormSettings;
   /** Key = actionId, value = JS function body (receives `ctx`). */
   actions?: Record<string, string>;
 }

@@ -2,9 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   PAGE_DEF_TEMPLATES,
 } from "../../lib/page-def-templates";
-import { LivePreview } from "./preview/LivePreview";
+import { StyledFormPreview } from "./builder/StyledFormPreview";
 import { INJECTED_PAGE_DEF_TEMPLATE_KEY } from "./builder/PageDefBuilder";
-import type { PageDef as BuilderPageDef, PageComponentType } from "./builder/pageDef";
+import type {
+  FormAppearanceSettings,
+  PageDef as BuilderPageDef,
+  PageComponentType,
+} from "./builder/pageDef";
 import type { PageDef as TemplatePageDef } from "../../lib/page-def";
 
 type TemplateEntry = [string, (typeof PAGE_DEF_TEMPLATES)[string]];
@@ -28,6 +32,65 @@ const COMPONENT_TYPE_MAP: Record<
 const cloneTemplatePageDef = (template: TemplatePageDef): TemplatePageDef =>
   JSON.parse(JSON.stringify(template)) as TemplatePageDef;
 
+/** Matches each marketing template to the visual builder `formSettings.appearance` (same mood as card gradients). */
+const DEFAULT_TEMPLATE_APPEARANCE: FormAppearanceSettings = {
+  primaryColor: "#4f46e5",
+  backgroundColor: "#eef2ff",
+  surfaceColor: "#ffffff",
+  textColor: "#0f172a",
+  borderRadius: "md",
+  submitStyle: "solid",
+  inputStyle: "outline",
+};
+
+const TEMPLATE_FORM_APPEARANCE: Record<string, FormAppearanceSettings> = {
+  "job-application": {
+    primaryColor: "#4f46e5",
+    backgroundColor: "#eef2ff",
+    surfaceColor: "#ffffff",
+    textColor: "#0f172a",
+    borderRadius: "md",
+    submitStyle: "solid",
+    inputStyle: "outline",
+  },
+  "customer-support-request": {
+    primaryColor: "#0d9488",
+    backgroundColor: "#ecfdf5",
+    surfaceColor: "#ffffff",
+    textColor: "#0f172a",
+    borderRadius: "lg",
+    submitStyle: "soft",
+    inputStyle: "filled",
+  },
+  "event-registration": {
+    primaryColor: "#7c3aed",
+    backgroundColor: "#f5f3ff",
+    surfaceColor: "#ffffff",
+    textColor: "#1e1b4b",
+    borderRadius: "lg",
+    submitStyle: "solid",
+    inputStyle: "outline",
+  },
+  "patient-intake": {
+    primaryColor: "#0f766e",
+    backgroundColor: "#ecfdf5",
+    surfaceColor: "#ffffff",
+    textColor: "#0f172a",
+    borderRadius: "md",
+    submitStyle: "soft",
+    inputStyle: "filled",
+  },
+  "lead-capture": {
+    primaryColor: "#b45309",
+    backgroundColor: "#fffbeb",
+    surfaceColor: "#ffffff",
+    textColor: "#1c1917",
+    borderRadius: "md",
+    submitStyle: "outline",
+    inputStyle: "outline",
+  },
+};
+
 const toBuilderPageDef = (template: TemplatePageDef): BuilderPageDef => {
   const components = template.components.map((component) => {
     const mappedType = COMPONENT_TYPE_MAP[String(component.type)];
@@ -49,6 +112,9 @@ const toBuilderPageDef = (template: TemplatePageDef): BuilderPageDef => {
     description: template.description,
     components,
     actions: template.actions,
+    formSettings: {
+      appearance: TEMPLATE_FORM_APPEARANCE[template.id] ?? DEFAULT_TEMPLATE_APPEARANCE,
+    },
   };
 };
 
@@ -169,10 +235,12 @@ export const TemplatesPage = ({ onOpenBuilder }: TemplatesPageProps) => {
     return PAGE_DEF_TEMPLATES[previewKey] ?? null;
   }, [previewKey]);
 
-  /** Fresh clone whenever modal opens (`previewKey` set) so live preview state resets */
-  const previewPageDef = useMemo(
+  /** Builder-shaped def + appearance for styled modal preview (matches builder / JSON live preview). */
+  const previewBuilderPageDef = useMemo(
     () =>
-      previewKey ? cloneTemplatePageDef(PAGE_DEF_TEMPLATES[previewKey]) : null,
+      previewKey
+        ? toBuilderPageDef(cloneTemplatePageDef(PAGE_DEF_TEMPLATES[previewKey]))
+        : null,
     [previewKey]
   );
 
@@ -260,7 +328,7 @@ export const TemplatesPage = ({ onOpenBuilder }: TemplatesPageProps) => {
         })}
       </div>
 
-      {previewKey && previewTemplate && previewPageDef && (
+      {previewKey && previewTemplate && previewBuilderPageDef && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
           role="presentation"
@@ -300,7 +368,7 @@ export const TemplatesPage = ({ onOpenBuilder }: TemplatesPageProps) => {
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-5">
-              <LivePreview pageDef={previewPageDef} />
+              <StyledFormPreview pageDef={previewBuilderPageDef} />
             </div>
 
             <div className="shrink-0 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 border-t border-slate-200 bg-white px-5 py-4">
@@ -316,7 +384,7 @@ export const TemplatesPage = ({ onOpenBuilder }: TemplatesPageProps) => {
                 onClick={() => handleEditInBuilder(previewTemplate)}
                 className="px-4 py-2.5 rounded-xl text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm"
               >
-                Edit in PageDef Builder
+                Edit in Formvity
               </button>
             </div>
           </div>

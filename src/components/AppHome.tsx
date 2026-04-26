@@ -119,18 +119,18 @@ export function AppHome({ onNavigate }: AppHomeProps) {
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-40" />
               <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
             </span>
-            Full-customizable forms for modern teams
+            Formvity — forms that feel like your product
           </div>
           <h1 className="mt-8 max-w-4xl text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.08]">
-            Build the form platform that helps you{" "}
+            <span className="text-white">Formvity</span> helps you{" "}
             <span className="bg-gradient-to-r from-indigo-300 via-white to-cyan-200 bg-clip-text text-transparent">
               move beyond basic form tools
             </span>{" "}
             with confidence.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-400 sm:text-xl">
-            Launch high-converting, fully customizable forms in minutes. Built for serious product teams that need more
-            than basic survey tools.
+            Launch polished, on-brand forms in minutes. Built for teams that outgrow generic survey tools and want a
+            serious builder experience.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:items-center">
             <button
@@ -287,8 +287,8 @@ export function AppHome({ onNavigate }: AppHomeProps) {
       <section className="border-t border-slate-200 bg-white py-16">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-6 px-4 text-center sm:flex-row sm:justify-between sm:text-left">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Ready to upgrade your team’s form experience?</h2>
-            <p className="mt-2 text-slate-600">Start visually today and keep advanced controls available as your company grows.</p>
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Ready to try Formvity?</h2>
+            <p className="mt-2 text-slate-600">Start in the visual builder and refine themes, fields, and JSON when you need to.</p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <button

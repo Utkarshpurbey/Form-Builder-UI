@@ -12,6 +12,17 @@ const INITIAL_PAGE_DEF: PageDef = {
   id: "page-1",
   title: "New page",
   description: "",
+  formSettings: {
+    appearance: {
+      primaryColor: "#4f46e5",
+      backgroundColor: "#eef2ff",
+      surfaceColor: "#ffffff",
+      textColor: "#0f172a",
+      borderRadius: "md",
+      submitStyle: "solid",
+      inputStyle: "outline",
+    },
+  },
   components: [],
 };
 
@@ -43,7 +54,7 @@ export default function PageDefBuilder() {
       setSelectedId(null);
       setCenterView("preview");
       setJsonError(null);
-      toast.success("Template loaded into PageDef Builder.");
+      toast.success("Template loaded into Formvity.");
     } catch {
       toast.error("Could not load selected template.");
     } finally {
@@ -170,6 +181,7 @@ export default function PageDefBuilder() {
       </main>
       <aside className="w-72 shrink-0 bg-white border-l border-slate-200 shadow-sm overflow-hidden flex flex-col">
         <ComponentConfigPanel
+          pageDef={pageDef}
           selectedComponent={selectedComponent}
           onPageDefChange={setPageDef}
           onClearSelection={() => setSelectedId(null)}

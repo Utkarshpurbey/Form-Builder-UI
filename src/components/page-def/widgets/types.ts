@@ -15,14 +15,14 @@ export interface BaseProps {
 
 /** Shared aesthetic styles for all form controls */
 export const inputStyles = {
-  container: "space-y-1.5",
+  container: "space-y-2",
   label:
-    "block text-sm font-medium text-slate-700 tracking-tight",
-  required: "text-rose-500 ml-0.5",
-  helper: "text-sm text-slate-500",
+    "block text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-[color:var(--fb-label,#475569)]",
+  required: "text-[color:var(--fb-primary,#4f46e5)] ml-0.5 font-bold",
+  helper: "text-[0.8125rem] leading-relaxed text-[color:var(--fb-muted,#64748b)]",
   inputBase:
-    "w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 transition-all duration-200 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10 disabled:opacity-60 disabled:cursor-not-allowed disabled:bg-slate-50",
+    "w-full rounded-[var(--fb-radius,0.75rem)] px-4 py-3 text-[0.9375rem] text-[color:var(--fb-text,#0f172a)] placeholder:text-[color:var(--fb-muted,#94a3b8)] placeholder:opacity-90 transition-[border-color,box-shadow,background-color] duration-200 focus:outline-none disabled:cursor-not-allowed disabled:opacity-55",
   inputError:
-    "border-rose-300 focus:border-rose-400 focus:ring-rose-500/10",
+    "!border-rose-400 focus:!border-rose-500 focus:!ring-rose-500/20",
   errorText: "text-sm text-rose-600 mt-1.5 flex items-center gap-1.5",
 } as const;

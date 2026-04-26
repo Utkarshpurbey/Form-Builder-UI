@@ -1,5 +1,5 @@
 /**
- * Component reference: docs + live demos for PageDef builder component types.
+ * Component reference: docs + live demos for Formvity field types.
  */
 import { useState, useEffect } from "react";
 import {
@@ -9,7 +9,27 @@ import {
 } from "./component-reference-data";
 import type { ComponentSpec } from "./component-reference-data";
 import { REGISTRY, getVariantProps } from "../components/page-def/builder/registry";
-import type { PageComponentType } from "../components/page-def/builder/pageDef";
+import { getAppearanceStyles } from "../components/page-def/builder/appearance";
+import type { PageComponentType, PageDef } from "../components/page-def/builder/pageDef";
+
+/** Theme vars for live demos so controls match the builder / preview styling. */
+const DOCS_DEMO_PAGE_DEF: PageDef = {
+  id: "component-reference-demo",
+  title: "Demo",
+  description: "",
+  components: [],
+  formSettings: {
+    appearance: {
+      primaryColor: "#4f46e5",
+      backgroundColor: "#eef2ff",
+      surfaceColor: "#ffffff",
+      textColor: "#0f172a",
+      borderRadius: "md",
+      submitStyle: "solid",
+      inputStyle: "outline",
+    },
+  },
+};
 
 const DEFAULT_VALUES: Record<string, string> = {
   text: "",
@@ -75,8 +95,17 @@ function ComponentDemo({ spec, value, onChange, parsedProps }: ComponentDemoProp
   if (base.max != null) props.max = String(base.max);
   if (base.id != null) props.id = String(base.id);
 
+  const shellStyle = getAppearanceStyles(DOCS_DEMO_PAGE_DEF);
+
   return (
-    <div className="rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 p-6">
+    <div
+      className="rounded-[var(--fb-radius)] border border-[color:color-mix(in_srgb,var(--fb-text)_10%,var(--fb-surface))] p-5 shadow-sm sm:p-6"
+      style={{
+        ...shellStyle,
+        backgroundColor: "var(--fb-surface)",
+        color: "var(--fb-text)",
+      }}
+    >
       <Component {...(props as Record<string, unknown>)} />
     </div>
   );
@@ -134,30 +163,29 @@ export default function ComponentReference() {
     <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto bg-gradient-to-b from-slate-50 to-slate-100/80">
       <div className="max-w-4xl mx-auto space-y-10">
         <header className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-            PageDef component reference
-          </h1>
-          <p className="text-slate-500 mt-2">
-            All components accept the base props below. Use{" "}
-            <code className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 text-sm">type</code> in
-            JSON to select the component; other keys are passed as props. Try each component below.
+          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Form components</h1>
+          <p className="text-slate-600 mt-2 max-w-2xl leading-relaxed">
+            Reference for field types used in the <strong className="text-slate-800">visual builder</strong> and{" "}
+            <strong className="text-slate-800">live preview</strong>. Form-level branding (colors, corners, button and
+            input styles) lives under <code className="rounded bg-slate-100 px-1.5 py-0.5 text-sm">formSettings.appearance</code>{" "}
+            — edit it in the builder&apos;s <strong className="text-slate-800">Look &amp; feel</strong> panel or in JSON.
           </p>
         </header>
 
         <section className="bg-white rounded-2xl border border-slate-100 p-8 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-800 mb-4">PageDef structure</h2>
+          <h2 className="text-lg font-semibold text-slate-800 mb-2">PageDef shape</h2>
+          <p className="text-sm text-slate-600 mb-4">
+            The form <strong className="text-slate-700">header</strong> (title and description) is separate from the field list. Each item in{" "}
+            <code className="rounded bg-slate-100 px-1 text-xs">components</code> is a field.
+          </p>
           <pre className="text-sm bg-slate-50 text-slate-700 p-4 rounded-xl border border-slate-100 overflow-x-auto">
             {JSON.stringify(PAGEDEF_STRUCTURE, null, 2)}
           </pre>
           <p className="text-sm text-slate-500 mt-3">
-            For <code className="px-1 rounded bg-slate-100">onChange</code>, use{" "}
-            <code className="px-1 rounded bg-slate-100">&quot;@actionDef.actionId&quot;</code> to
-            run JavaScript from <code className="px-1 rounded bg-slate-100">actions</code>. Action
-            code receives <code className="px-1 rounded bg-slate-100">ctx</code> with{" "}
-            <code className="px-1 rounded bg-slate-100">value</code>,{" "}
-            <code className="px-1 rounded bg-slate-100">values</code>,{" "}
-            <code className="px-1 rounded bg-slate-100">component</code>,{" "}
-            <code className="px-1 rounded bg-slate-100">setValue(id, v)</code>.
+            Advanced: optional <code className="rounded bg-slate-100 px-1">onChange</code> can reference{" "}
+            <code className="rounded bg-slate-100 px-1">&quot;@actionDef.&lt;id&gt;&quot;</code> to run code from{" "}
+            <code className="rounded bg-slate-100 px-1">actions</code> (<code className="rounded bg-slate-100 px-1">ctx.value</code>,{" "}
+            <code className="rounded bg-slate-100 px-1">ctx.setValue</code>, etc.).
           </p>
         </section>
 
@@ -191,18 +219,18 @@ export default function ComponentReference() {
         </section>
 
         <section className="space-y-8">
-          <h2 className="text-lg font-semibold text-slate-800">Components — try them</h2>
+          <h2 className="text-lg font-semibold text-slate-800">Field types</h2>
           {COMPONENT_SPECS.map((spec) => (
             <div
               key={spec.type}
               className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm"
             >
-              <div className="flex items-baseline gap-2 flex-wrap">
-                <code className="text-base font-medium text-indigo-600">{spec.type}</code>
-                <span className="text-slate-500 text-sm">— {spec.description}</span>
+              <div className="flex flex-wrap items-baseline gap-2">
+                <code className="text-base font-semibold text-indigo-600">{spec.type}</code>
+                <span className="text-slate-500 text-sm">{spec.description}</span>
               </div>
-              <p className="text-sm text-slate-600 mt-1">
-                <strong>Value format:</strong> {spec.valueFormat}
+              <p className="mt-1 text-xs text-slate-500">
+                Stored value: <span className="font-mono text-slate-600">{spec.valueFormat}</span>
               </p>
 
               {(() => {
@@ -232,15 +260,13 @@ export default function ComponentReference() {
                     </div>
 
                     <div className="mt-5">
-                      <h3 className="text-sm font-medium text-slate-700 mb-2">
-                        Edit props JSON (changes apply to the component above)
-                      </h3>
+                      <h3 className="text-sm font-medium text-slate-700 mb-2">Props JSON</h3>
                       <textarea
                         value={raw}
                         onChange={(e) =>
                           setPropsJson((prev) => ({ ...prev, [spec.type]: e.target.value }))
                         }
-                        className="w-full min-h-[180px] px-4 py-3 rounded-xl border-2 border-slate-200 bg-white font-mono text-xs text-slate-800 focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-500/10"
+                        className="w-full min-h-[140px] px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50/80 font-mono text-xs text-slate-800 focus:border-indigo-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10"
                         spellCheck={false}
                         placeholder='{ "id": "...", "type": "...", "label": "...", "value": "" }'
                       />
