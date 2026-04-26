@@ -40,8 +40,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Must match the repo name segment in https://<owner>.github.io/<repo-name>/
+      # After renaming the repo, push again (or re-run this workflow) so assets use the new base.
       - name: Build
-        run: npm run build
+        run: |
+          echo "BASE_PATH=$BASE_PATH"
+          npm run build
         env:
           BASE_PATH: /${{ github.event.repository.name }}/
 
