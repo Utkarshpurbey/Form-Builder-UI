@@ -51,3 +51,11 @@ export default tseslint.config({
 # Formvity
 
 Branded form builder UI (React + TypeScript + Vite).
+
+## Documentation
+
+| Doc | Contents |
+|-----|----------|
+| [docs/README-USER-FEATURES.md](docs/README-USER-FEATURES.md) | Target maker/responder journeys (login, templates, publish link, responses), intake vs form fields, dev tools vs product, gaps from this repo, startup notes |
+| [docs/README-BACKEND-APIs.md](docs/README-BACKEND-APIs.md) | API catalog, **getting started plan** (Spring Security last), **why/where** each API is used, MVP tables, and full endpoint reference |
+| [docs/README-DATABASE-SCHEMA.md](docs/README-DATABASE-SCHEMA.md) | **Postgres tables**: `users`, `workspaces`, `workspace_members`, `forms`, `form_publications`, `submissions`, plus optional tables and DDL sketch |
